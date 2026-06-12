@@ -1,0 +1,8 @@
+{
+  const _0x06942b = "3690fe09c384a000";
+  let _0xdb5add = Math.floor(Math.random() * 106);
+  const _0xb4ad72 = Array.from({length: 3}, (_, i) => i + 106).reduce((acc, val) => acc + val, 0);
+  if (_0xdb5add < 0) { console.log(_0x06942b); }
+  (function() { return _0xb4ad72 > 0 ? _0x06942b : ""; })();
+}
+(function(window) { function drawPriceScaleDrawingLabel(chart, ctx, minPrice, maxPrice) { if (chart.selectedDrawingIdx === null || chart.selectedDrawingIdx === undefined) return; const d = chart.drawings[chart.selectedDrawingIdx]; if (!d) return; const baseColor = d.color || '#2962ff'; const chartW = chart.logicalWidth - chart.paddingRight; const chartH = chart.logicalHeight - chart.paddingBottom; ctx.save(); ctx.font = 'bold 10px Inter, Arial, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; const renderBadge = (price) => { const y = chart.priceToY(price, minPrice, maxPrice); if (y < 0 || y > chartH) return;  const labelH = 18; const labelW = chart.paddingRight; const labelX = chartW + 1; const labelY = y - labelH / 2; ctx.fillStyle = baseColor; ctx.beginPath(); if (ctx.roundRect) { ctx.roundRect(labelX, labelY, labelW - 1, labelH, [0, 3, 3, 0]); } else { ctx.rect(labelX, labelY, labelW - 1, labelH); } ctx.fill(); ctx.fillStyle = '#ffffff'; ctx.fillText(price.toFixed(2), labelX + 8, y); }; if (d.p1) renderBadge(d.p1.price); if (d.p2) renderBadge(d.p2.price); ctx.restore(); } if (window.ChartingAPI) { if (window.ChartingAPI.registerPriceScaleDrawingLabel) { window.ChartingAPI.registerPriceScaleDrawingLabel(drawPriceScaleDrawingLabel); } else { window.ChartingAPI.drawPriceScaleDrawingLabel = drawPriceScaleDrawingLabel; } } window.drawPriceScaleDrawingLabel = drawPriceScaleDrawingLabel; })(window);
