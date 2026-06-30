@@ -19,32 +19,85 @@
   // - xOffset: Starting X position on the canvas for the visible bars
   // - chartInstance: The chart widget context
   
-  /*
-  window.ChartingAPI.registerCandleType('my_custom_candles', function(ctx, visibleBars, slot, bodyW, chartH, priceToY, themeColors, xOffset, chartInstance) {
+  function drawAreaSeries(ctx, visible, candleSlot, bodyW, chartH, priceToY, T, xOffset = 0, state) {
+    if (!visible || visible.length === 0) return;
+
     ctx.save();
-    ctx.strokeStyle = '#ff9800'; // Custom orange color
-    ctx.lineWidth = 1.5;
     
-    visibleBars.forEach((bar, index) => {
-      const x = xOffset + index * slot + slot / 2;
-      const yOpen = priceToY(bar.open);
-      const yClose = priceToY(bar.close);
-      const yHigh = priceToY(bar.high);
-      const yLow = priceToY(bar.low);
-      
-      // Draw wick
-      ctx.beginPath();
-      ctx.moveTo(x, yHigh);
-      ctx.lineTo(x, yLow);
-      ctx.stroke();
-      
-      // Draw body
-      ctx.fillStyle = bar.close >= bar.open ? '#26a69a' : '#ef5350';
-      ctx.fillRect(x - bodyW / 2, Math.min(yOpen, yClose), bodyW, Math.max(1, Math.abs(yClose - yOpen)));
+    // Draw the gradient fill first
+    ctx.beginPath();
+    const isLight = document.body.classList.contains('light-theme');
+    
+    let firstX = 0;
+    let lastX = 0;
+    
+    visible.forEach((bar, index) => {
+      const x = xOffset + index * candleSlot + candleSlot / 2;
+      const price = bar.close !== undefined ? bar.close : (bar.yield !== undefined ? bar.yield : (bar.price !== undefined ? bar.price : (bar.y !== undefined ? bar.y : 0)));
+      const y = priceToY(price);
+
+      if (index === 0) {
+        firstX = x;
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+      if (index === visible.length - 1) {
+        lastX = x;
+      }
     });
+    
+    // Complete the path down to the bottom of the main chart pane (chartH)
+    ctx.lineTo(lastX, chartH);
+    ctx.lineTo(firstX, chartH);
+    ctx.closePath();
+    
+    // Create area gradient (premium green/blue matching backtestx theme)
+    const gradient = ctx.createLinearGradient(0, 0, 0, chartH);
+    gradient.addColorStop(0, 'rgba(38, 166, 154, 0.45)');
+    gradient.addColorStop(1, 'rgba(38, 166, 154, 0.00)');
+    ctx.fillStyle = gradient;
+    ctx.fill();
+
+    // Now draw the line stroke on top
+    ctx.beginPath();
+    ctx.lineWidth = 2.5;
+    ctx.strokeStyle = '#26a69a'; // Premium Brand Green
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+
+    visible.forEach((bar, index) => {
+      const x = xOffset + index * candleSlot + candleSlot / 2;
+      const price = bar.close !== undefined ? bar.close : (bar.yield !== undefined ? bar.yield : (bar.price !== undefined ? bar.price : (bar.y !== undefined ? bar.y : 0)));
+      const y = priceToY(price);
+
+      if (index === 0) {
+        ctx.moveTo(x, y);
+      } else {
+        ctx.lineTo(x, y);
+      }
+    });
+    ctx.stroke();
+
+    // Draw vertex circles for style
+    visible.forEach((bar, index) => {
+      const x = xOffset + index * candleSlot + candleSlot / 2;
+      const price = bar.close !== undefined ? bar.close : (bar.yield !== undefined ? bar.yield : (bar.price !== undefined ? bar.price : (bar.y !== undefined ? bar.y : 0)));
+      const y = priceToY(price);
+
+      ctx.beginPath();
+      ctx.arc(x, y, 3.5, 0, 2 * Math.PI);
+      ctx.fillStyle = isLight ? '#ffffff' : '#1b1b1d';
+      ctx.fill();
+      ctx.strokeStyle = '#26a69a';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    });
+
     ctx.restore();
-  });
-  */
+  }
+
+  window.ChartingAPI.registerCandleType('area', drawAreaSeries);
 
   console.log("🔌 [ChartingAPI] Loaded custom developer candle types successfully.");
 })(window);

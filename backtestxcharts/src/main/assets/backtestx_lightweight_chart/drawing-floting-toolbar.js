@@ -58,7 +58,8 @@
       const clone = {
         type: drawing.type,
         color: drawing.color,
-        p1: { idx: drawing.p1.idx + 3, price: drawing.p1.price * 1.008 }
+        p1: { idx: drawing.p1.idx + 3, price: drawing.p1.price * 1.008 },
+        visibilityInterval: drawing.visibilityInterval || chart.resolution
       };
       
       if (drawing.p2) {
@@ -69,7 +70,7 @@
         clone.text = drawing.text;
       }
       
-      chart.drawings.push(clone);
+      chart.drawings.push(clone); if (window.ChartingAPI && typeof window.ChartingAPI.saveCustomDrawings === 'function') { window.ChartingAPI.saveCustomDrawings(chart, chart.drawings); }
       
       // Focus on the newly created clone
       chart.selectedDrawingIdx = chart.drawings.length - 1;
@@ -99,6 +100,9 @@
         chart.drawings.splice(chart.selectedDrawingIdx, 1);
         chart.selectedDrawingIdx = null;
         chart.render();
+        if (window.ChartingAPI && typeof window.ChartingAPI.saveCustomDrawings === 'function') {
+          window.ChartingAPI.saveCustomDrawings(chart, chart.drawings);
+        }
         if (window.DrawingFloatingToolbar) {
           window.DrawingFloatingToolbar.hide();
         }

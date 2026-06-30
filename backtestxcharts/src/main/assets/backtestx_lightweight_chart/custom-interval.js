@@ -19,5 +19,6 @@
   window.ChartingAPI.registerCustomInterval('1m');
   window.ChartingAPI.registerCustomInterval('5m');
   window.ChartingAPI.registerCustomInterval('30m');
+  window.ChartingAPI.registerCustomInterval('1D');
   console.log("🔌 [ChartingAPI] Loaded custom developer intervals successfully.");
 })(window);

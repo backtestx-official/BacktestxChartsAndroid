@@ -25,7 +25,37 @@
       if (scaleType !== 'time' && this.chartType === 'candlestick') {
         this.customDrawCandles = window.ChartingAPI ? window.ChartingAPI.getCandleRenderer('line') : null;
       }
+      this._primitives = [];
       console.log(`⚖️ [BacktestxChart] Initialized with scale: ${scaleType}`);
+    }
+
+    attachPrimitive(primitive) {
+      if (!this._primitives) {
+        this._primitives = [];
+      }
+      if (!this._primitives.includes(primitive)) {
+        this._primitives.push(primitive);
+        if (typeof primitive.attached === 'function') {
+          primitive.attached({
+            chart: this,
+            requestUpdate: () => this.render()
+          });
+        }
+        this.render();
+      }
+    }
+
+    detachPrimitive(primitive) {
+      if (this._primitives) {
+        const idx = this._primitives.indexOf(primitive);
+        if (idx !== -1) {
+          this._primitives.splice(idx, 1);
+          if (typeof primitive.detached === 'function') {
+            primitive.detached();
+          }
+          this.render();
+        }
+      }
     }
 
     // ── Coordinate Conversions delegated to scales ──
@@ -90,8 +120,38 @@
       // 2. Draw price scale (delegated to bundles/decoded.js)
       window.DecodedScale.drawPriceScale(this, ctx, minPrice, maxPrice, chartW);
 
+      // Draw price scale primitives
+      if (this._primitives && this._primitives.length > 0) {
+        this._primitives.forEach(p => {
+          if (typeof p.drawPriceScale === 'function') {
+            try {
+              ctx.save();
+              p.drawPriceScale(ctx, this.paddingRight, chartH);
+              ctx.restore();
+            } catch (e) {
+              console.error("Error drawing price scale primitive:", e);
+            }
+          }
+        });
+      }
+
       // 3. Draw time scale (delegated to scales)
       (this.horizontalScale || window.TimeScale).drawTimeScale(this, ctx, chartH + totalPanelsH);
+
+      // Draw time scale primitives
+      if (this._primitives && this._primitives.length > 0) {
+        this._primitives.forEach(p => {
+          if (typeof p.drawTimeScale === 'function') {
+            try {
+              ctx.save();
+              p.drawTimeScale(ctx, chartW, this.paddingBottom);
+              ctx.restore();
+            } catch (e) {
+              console.error("Error drawing time scale primitive:", e);
+            }
+          }
+        });
+      }
 
       // 4. Draw Series Content (Volume, Candles, Drawings) - Clipped to main chart viewport
       ctx.save();
@@ -102,6 +162,21 @@
       // Draw background watermark
       if (window.Watermarks && typeof window.Watermarks.draw === 'function') {
         window.Watermarks.draw(this, ctx, chartW, chartH);
+      }
+
+      // Draw background primitives
+      if (this._primitives && this._primitives.length > 0) {
+        this._primitives.forEach(p => {
+          if (typeof p.drawBackground === 'function') {
+            try {
+              ctx.save();
+              p.drawBackground(ctx, chartW, chartH);
+              ctx.restore();
+            } catch (e) {
+              console.error("Error drawing background primitive:", e);
+            }
+          }
+        });
       }
 
       // Draw volume bars (bottom overlay)
@@ -288,6 +363,21 @@
           console.error(`Error rendering overlay indicator ${x.ind.type}:`, e);
         }
       });
+
+      // Draw foreground primitives
+      if (this._primitives && this._primitives.length > 0) {
+        this._primitives.forEach(p => {
+          if (typeof p.draw === 'function') {
+            try {
+              ctx.save();
+              p.draw(ctx, chartW, chartH);
+              ctx.restore();
+            } catch (e) {
+              console.error("Error drawing foreground primitive:", e);
+            }
+          }
+        });
+      }
 
       ctx.restore();
 
