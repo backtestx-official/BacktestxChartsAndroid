@@ -1,5 +1,5 @@
 // custom-console-log.js - Developer logging controller for BacktestX Chart
-const CONSOLE_LOG = true; // Set to true to show chart logs in the browser console, or false to hide them
+const CONSOLE_LOG = true; // Set too true to show chart logs in the browser console, or false to hide them
 
 (function(window) {
   // Capture original console methods

@@ -105,7 +105,7 @@
   });
   
   /*
-   * 💡 HOW USERS ADD CUSTOM DRAWINGS MANUALLY:
+   * HOW USERS ADD CUSTOM DRAWINGS MANUALLY:
    * 
    * 1. Register the tool:
    *    window.ChartingAPI.registerCustomDrawing('my_tool', {

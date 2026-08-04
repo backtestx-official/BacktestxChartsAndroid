@@ -6,7 +6,7 @@
   }
 
   /*
-   * 💡 HOW USERS CUSTOMIZE THE TIME SCALE:
+   *  HOW USERS CUSTOMIZE THE TIME SCALE:
    * 
    * Call the ChartingAPI to configure timescale settings:
    * 

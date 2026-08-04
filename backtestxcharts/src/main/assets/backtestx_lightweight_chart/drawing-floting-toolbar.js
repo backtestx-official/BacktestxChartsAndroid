@@ -6,7 +6,7 @@
   }
 
   // ====================================================================
-  // BUTTON 1: Lock / Unlock Drawing
+  // BUTTON 1: Lock /Unlock Drawing
   // Prevents the selected drawing from being dragged or modified
   // ====================================================================
   window.ChartingAPI.registerFloatingToolbarButton('lock_toggle', {

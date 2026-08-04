@@ -1,5 +1,5 @@
 // App.js - Lightweight chart controller logic
-// 💡 CUSTOMIZE THIS FILE: You can adjust initial settings (like default symbol or resolution) or customize toolbar event listeners here.
+// CUSTOMIZE THIS FILE: You can adjust initial settings (like default symbol or resolution) or customize toolbar event listeners here.
 document.addEventListener('DOMContentLoaded', () => {
   // 1. Initialize stock datafeed
   const datafeed = new window.Datafeed();

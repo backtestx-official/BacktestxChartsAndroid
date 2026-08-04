@@ -6,7 +6,7 @@
   }
 
   /*
-   * 💡 HOW USERS CUSTOMIZE THE PRICE SCALE:
+   *  HOW USERS CUSTOMIZE THE PRICE SCALE:
    * 
    * Call the ChartingAPI to configure price scale settings:
    * 

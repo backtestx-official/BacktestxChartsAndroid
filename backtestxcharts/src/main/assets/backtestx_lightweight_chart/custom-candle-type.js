@@ -52,17 +52,28 @@
     ctx.lineTo(firstX, chartH);
     ctx.closePath();
     
-    // Create area gradient (premium green/blue matching backtestx theme)
+    // Read color from settings, fallback to '#26a69a'
+    const customColor = state?.options?.chartSettings?.symbol?.lineColor || '#26a69a';
+    
+    // Convert hex to rgb for rgba usage
+    let r = 38, g = 166, b = 154;
+    if (customColor.match(/^#[0-9a-fA-F]{6}$/)) {
+        r = parseInt(customColor.substring(1, 3), 16);
+        g = parseInt(customColor.substring(3, 5), 16);
+        b = parseInt(customColor.substring(5, 7), 16);
+    }
+    
+    // Create area gradient
     const gradient = ctx.createLinearGradient(0, 0, 0, chartH);
-    gradient.addColorStop(0, 'rgba(38, 166, 154, 0.45)');
-    gradient.addColorStop(1, 'rgba(38, 166, 154, 0.00)');
+    gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.45)`);
+    gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0.00)`);
     ctx.fillStyle = gradient;
     ctx.fill();
 
     // Now draw the line stroke on top
     ctx.beginPath();
     ctx.lineWidth = 2.5;
-    ctx.strokeStyle = '#26a69a'; // Premium Brand Green
+    ctx.strokeStyle = customColor; 
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
 
@@ -78,21 +89,6 @@
       }
     });
     ctx.stroke();
-
-    // Draw vertex circles for style
-    visible.forEach((bar, index) => {
-      const x = xOffset + index * candleSlot + candleSlot / 2;
-      const price = bar.close !== undefined ? bar.close : (bar.yield !== undefined ? bar.yield : (bar.price !== undefined ? bar.price : (bar.y !== undefined ? bar.y : 0)));
-      const y = priceToY(price);
-
-      ctx.beginPath();
-      ctx.arc(x, y, 3.5, 0, 2 * Math.PI);
-      ctx.fillStyle = isLight ? '#ffffff' : '#1b1b1d';
-      ctx.fill();
-      ctx.strokeStyle = '#26a69a';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-    });
 
     ctx.restore();
   }

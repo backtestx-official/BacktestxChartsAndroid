@@ -6,7 +6,7 @@
   }
 
   /*
-   * 💡 HOW USERS REGISTER CUSTOM INDICATORS:
+   *  HOW USERS REGISTER CUSTOM INDICATORS:
    * 
    * Call the ChartingAPI to register a technical indicator:
    * 

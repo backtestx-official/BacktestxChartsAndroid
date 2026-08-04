@@ -6,7 +6,7 @@
   }
 
   /*
-   * 💡 HOW USERS ADD CUSTOM TOOLBAR BUTTONS MANUALLY:
+   *  HOW USERS ADD CUSTOM TOOLBAR BUTTONS MANUALLY:
    * 
    * 1. Register the button:
    *    window.ChartingAPI.registerTopToolbarButton('my_action_id', {

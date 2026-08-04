@@ -6,7 +6,7 @@
       this._ws = null;
     }
 
-    // ─── Symbol Resolution ───────────────────────────────────────────────────
+    //  ─── Symbol Resolution ───────────────────────────────────────────────────
     async resolveSymbol(symbolName) {
       if (window.ChartingAPI && typeof window.ChartingAPI.resolveCustomSymbol === 'function') {
         return new Promise((resolve, reject) => {

@@ -8,7 +8,7 @@
 
   // Examples: Add custom intervals to the dropdown menu groups.
   // The format should be a number followed by:
-  // - 'm' for Minutes (e.g., '2m', '10m', '45m')
+  // - 'm' for Minutes (e.g., '2m', '10m', '15' '45m')
   // - 'H' for Hours (e.g., '2H', '3H', '12H')
   // - 'D' for Days (e.g., '1D', '2D', '3D')
   // - 'W' for Weeks (e.g., '1W', '2W')

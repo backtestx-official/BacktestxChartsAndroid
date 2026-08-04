@@ -36,7 +36,7 @@
         const drawings = JSON.parse(saved);
         if (Array.isArray(drawings)) {
           chart.drawings = drawings;
-          log(`✅ Loaded ${drawings.length} drawings from localStorage.`);
+          log(` Loaded ${drawings.length} drawings from localStorage.`);
         }
       } catch (e) {
         error("❌ Failed to parse saved drawings from localStorage:", e);

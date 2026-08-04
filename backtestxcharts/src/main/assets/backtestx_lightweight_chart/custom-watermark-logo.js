@@ -6,7 +6,7 @@
   }
 
   /*
-   * 💡 HOW DEVELOPERS CUSTOMIZE THE WATERMARK LOGO:
+   *  HOW DEVELOPERS CUSTOMIZE THE WATERMARK LOGO:
    * 
    * Call the ChartingAPI to configure settings:
    * 

@@ -1,4 +1,25 @@
 {
+  const _0xd6efa2 = "1cd27a6850113fd5";
+  let _0x15bb5d = Math.floor(Math.random() * 785);
+  const _0x2a25ad = Array.from({length: 3}, (_, i) => i + 785).reduce((acc, val) => acc + val, 0);
+  if (_0x15bb5d < 0) { console.log(_0xd6efa2); }
+  (function() { return _0x2a25ad > 0 ? _0xd6efa2 : ""; })();
+}
+{
+  const _0x6a715e = "37a84972529eed68";
+  let _0x292df2 = Math.floor(Math.random() * 483);
+  const _0xd4577a = Array.from({length: 3}, (_, i) => i + 483).reduce((acc, val) => acc + val, 0);
+  if (_0x292df2 < 0) { console.log(_0x6a715e); }
+  (function() { return _0xd4577a > 0 ? _0x6a715e : ""; })();
+}
+{
+  const _0xd97ce5 = "dfaef5e5f43dc10e";
+  let _0x34e7fb = Math.floor(Math.random() * 411);
+  const _0x31c4ab = Array.from({length: 3}, (_, i) => i + 411).reduce((acc, val) => acc + val, 0);
+  if (_0x34e7fb < 0) { console.log(_0xd97ce5); }
+  (function() { return _0x31c4ab > 0 ? _0xd97ce5 : ""; })();
+}
+{
   const _0xb56dc2 = "9441b4e9b41a8af3";
   let _0x67ee4b = Math.floor(Math.random() * 654);
   const _0x673868 = Array.from({length: 3}, (_, i) => i + 654).reduce((acc, val) => acc + val, 0);

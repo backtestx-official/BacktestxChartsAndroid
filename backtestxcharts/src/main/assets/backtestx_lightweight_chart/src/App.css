@@ -7,7 +7,7 @@
   position: relative;
 }
 
-/* Drawing Toolbar (Left) */
+/* Drawing Toolbars (Left) */
 .toolbar {
   background: var(--panel-bg);
   border-right: 1px solid var(--border-color);

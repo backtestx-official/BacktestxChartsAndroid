@@ -26,7 +26,7 @@
     };
 
     // ====================================================================
-    // 🛠️ DEVELOPER CUSTOMIZATION AREA:
+    //  DEVELOPER CUSTOMIZATION AREA:
     // Only contains Crypto symbols by default. Developers can add more
     // lists or modify options (type, session, pricescale) as needed.
     // ====================================================================

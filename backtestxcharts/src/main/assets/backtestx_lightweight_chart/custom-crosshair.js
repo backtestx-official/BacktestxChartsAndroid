@@ -6,7 +6,7 @@
   }
 
   /*
-   * 💡 HOW USERS CUSTOMIZE THE CROSSHAIR:
+   *  HOW USERS CUSTOMIZE THE CROSSHAIR:
    * 
    * Call the ChartingAPI to configure crosshair settings:
    * 

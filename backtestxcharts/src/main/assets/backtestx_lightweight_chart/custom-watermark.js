@@ -6,7 +6,7 @@
   }
 
   /*
-   * 💡 HOW USERS CUSTOMIZE THE CHART WATERMARK:
+   *  HOW USERS CUSTOMIZE THE CHART WATERMARK:
    * 
    * Call the ChartingAPI to configure settings:
    * 

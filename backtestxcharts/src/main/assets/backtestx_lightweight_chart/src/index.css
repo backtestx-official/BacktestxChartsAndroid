@@ -498,7 +498,7 @@ body.light-theme .interval-dropdown-item:hover {
   color: #ffffff !important;
 }
 
-/* Candle Type Dropdown Styles */
+/* Candle Type Dropdown Style */
 .candle-type-dropdown-menu {
   position: absolute;
   background: var(--panel-bg);

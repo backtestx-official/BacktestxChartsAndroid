@@ -1,4 +1,4 @@
-// custom-timezone.js - Developer-customizable script to add custom timezones to the chart
+// custom-timezone.js /- Developer-customizable script to add custom timezones to the chart
 (function(window) {
   // Ensure the TimeZone module is loaded before registering
   if (!window.TimeZone) {
