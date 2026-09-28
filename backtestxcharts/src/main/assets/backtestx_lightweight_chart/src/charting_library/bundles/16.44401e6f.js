@@ -1,8 +1,8 @@
 {
-  const _0x2f0497 = "5147219290f6168d";
-  let _0x525e62 = Math.floor(Math.random() * 295);
-  const _0xa1521e = Array.from({length: 3}, (_, i) => i + 295).reduce((acc, val) => acc + val, 0);
-  if (_0x525e62 < 0) { console.log(_0x2f0497); }
-  (function() { return _0xa1521e > 0 ? _0x2f0497 : ""; })();
+  const _0xf09b90 = "b3037ff906d35ad0";
+  let _0x3ebd03 = Math.floor(Math.random() * 652);
+  const _0x5ed86f = Array.from({length: 3}, (_, i) => i + 652).reduce((acc, val) => acc + val, 0);
+  if (_0x3ebd03 < 0) { console.log(_0xf09b90); }
+  (function() { return _0x5ed86f > 0 ? _0xf09b90 : ""; })();
 }
 (function(window) { if (!window.ChartingAPI) return; window.ChartingAPI.registerIndicator('atr', { name: 'Average True Range', type: 'pane', levels: [], params: { period: 14 }, defaultColor: '#FF5722', calculate: function(bars, params) { const period = params.period || 14; const atr = new Array(bars.length).fill(null); if (bars.length < 2) return atr; const tr = new Array(bars.length).fill(0); tr[0] = bars[0].high - bars[0].low; for (let i = 1; i < bars.length; i++) { const h_l = bars[i].high - bars[i].low; const h_pc = Math.abs(bars[i].high - bars[i - 1].close); const l_pc = Math.abs(bars[i].low - bars[i - 1].close); tr[i] = Math.max(h_l, h_pc, l_pc); } let sum = 0; const limit = Math.min(period, bars.length); for (let i = 0; i < limit; i++) sum += tr[i]; let prevAtr = sum / limit; atr[limit - 1] = prevAtr; const alpha = 1 / period; for (let i = period; i < bars.length; i++) { const val = tr[i] * alpha + prevAtr * (1 - alpha); atr[i] = val; prevAtr = val; } return atr; }, render: function(ctx, chart, values, bounds, color) { const { startIndex, endIndex, toY } = bounds; ctx.beginPath(); ctx.strokeStyle = color || '#FF5722'; ctx.lineWidth = 1.5; ctx.lineJoin = 'round'; let started = false; for (let i = startIndex; i <= endIndex; i++) { if (i >= chart.bars.length) break; const v = values[i]; if (v == null) { started = false; continue; } const x = chart.barToX(i); const y = toY(v); if (!started) { ctx.moveTo(x, y); started = true; } else { ctx.lineTo(x, y); } } ctx.stroke(); } }); })(window);

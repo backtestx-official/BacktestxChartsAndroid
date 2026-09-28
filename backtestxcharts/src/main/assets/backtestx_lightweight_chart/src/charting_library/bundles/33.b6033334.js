@@ -1,9 +1,9 @@
 {
-  const _0xe61908 = "538618da8cbe9432";
-  let _0x0c46a7 = Math.floor(Math.random() * 524);
-  const _0x63a55a = Array.from({length: 3}, (_, i) => i + 524).reduce((acc, val) => acc + val, 0);
-  if (_0x0c46a7 < 0) { console.log(_0xe61908); }
-  (function() { return _0x63a55a > 0 ? _0xe61908 : ""; })();
+  const _0xe1a45e = "66cf18520e1df67a";
+  let _0x1bd715 = Math.floor(Math.random() * 411);
+  const _0x355137 = Array.from({length: 3}, (_, i) => i + 411).reduce((acc, val) => acc + val, 0);
+  if (_0x1bd715 < 0) { console.log(_0xe1a45e); }
+  (function() { return _0x355137 > 0 ? _0xe1a45e : ""; })();
 }
 (function(window) {
     class SettingsPopup {

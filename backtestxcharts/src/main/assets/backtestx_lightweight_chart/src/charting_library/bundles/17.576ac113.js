@@ -1,8 +1,8 @@
 {
-  const _0x9ebe96 = "414bb93e0741698a";
-  let _0x7066b4 = Math.floor(Math.random() * 508);
-  const _0x98d754 = Array.from({length: 3}, (_, i) => i + 508).reduce((acc, val) => acc + val, 0);
-  if (_0x7066b4 < 0) { console.log(_0x9ebe96); }
-  (function() { return _0x98d754 > 0 ? _0x9ebe96 : ""; })();
+  const _0xc7f00e = "a5b770df558187fb";
+  let _0xd7c8da = Math.floor(Math.random() * 192);
+  const _0xe0ff18 = Array.from({length: 3}, (_, i) => i + 192).reduce((acc, val) => acc + val, 0);
+  if (_0xd7c8da < 0) { console.log(_0xc7f00e); }
+  (function() { return _0xe0ff18 > 0 ? _0xc7f00e : ""; })();
 }
 (function(window) { if (!window.ChartingAPI) return; window.ChartingAPI.registerIndicator('cci', { name: 'Commodity Channel Index', type: 'pane', levels: [-100, 0, 100], params: { period: 20 }, defaultColor: '#00BCD4', calculate: function(bars, params) { const period = params.period || 20; const cci = new Array(bars.length).fill(null); if (bars.length < period) return cci; const tp = bars.map(b => (b.high + b.low + b.close) / 3); const smaTp = new Array(bars.length).fill(null); for (let i = period - 1; i < bars.length; i++) { let sum = 0; for (let j = 0; j < period; j++) { sum += tp[i - j]; } smaTp[i] = sum / period; } for (let i = period - 1; i < bars.length; i++) { let meanDev = 0; for (let j = 0; j < period; j++) { meanDev += Math.abs(tp[i - j] - smaTp[i]); } meanDev /= period; cci[i] = meanDev === 0 ? 0 : (tp[i] - smaTp[i]) / (0.015 * meanDev); } return cci; }, render: function(ctx, chart, values, bounds, color) { const { startIndex, endIndex, chartW, toY } = bounds; const themeColor = color || '#00BCD4'; ctx.save(); ctx.fillStyle = themeColor; ctx.globalAlpha = 0.04; const y100 = toY(100); const yNeg100 = toY(-100); ctx.fillRect(0, y100, chartW, yNeg100 - y100); ctx.restore(); ctx.beginPath(); ctx.strokeStyle = themeColor; ctx.lineWidth = 1.5; ctx.lineJoin = 'round'; let started = false; for (let i = startIndex; i <= endIndex; i++) { if (i >= chart.bars.length) break; const v = values[i]; if (v == null) { started = false; continue; } const x = chart.barToX(i); const y = toY(v); if (!started) { ctx.moveTo(x, y); started = true; } else { ctx.lineTo(x, y); } } ctx.stroke(); } }); })(window);

@@ -1,9 +1,9 @@
 {
-  const _0xa2940f = "2c2931e7f0ca76fd";
-  let _0xd39c2e = Math.floor(Math.random() * 195);
-  const _0x96fb23 = Array.from({length: 3}, (_, i) => i + 195).reduce((acc, val) => acc + val, 0);
-  if (_0xd39c2e < 0) { console.log(_0xa2940f); }
-  (function() { return _0x96fb23 > 0 ? _0xa2940f : ""; })();
+  const _0x114f58 = "a7ef5323ddd63e32";
+  let _0xc00e1c = Math.floor(Math.random() * 720);
+  const _0x197bf3 = Array.from({length: 3}, (_, i) => i + 720).reduce((acc, val) => acc + val, 0);
+  if (_0xc00e1c < 0) { console.log(_0x114f58); }
+  (function() { return _0x197bf3 > 0 ? _0x114f58 : ""; })();
 }
 (function(window) { let menuDiv; const collapsedGroups = { SECONDS: false, MINUTES: false, HOURS: false, DAYS: false }; const defaultPresets = [ '1m', '2m', '3m', '5m', '10m', '15m', '30m', '45m', '1H', '2H', '3H', '4H', '6H', '12H', '1D', '1W', '1M' ]; const TopToolbarInterval = { init: function() { if (window.ChartingAPI && window.ChartingAPI.registerTopToolbarButton) { window.ChartingAPI.registerTopToolbarButton('interval', { label: window.chart ? window.chart.resolution : '1D', iconSvg: `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-left: 2px;">
             <polyline points="6 9 12 15 18 9"></polyline>

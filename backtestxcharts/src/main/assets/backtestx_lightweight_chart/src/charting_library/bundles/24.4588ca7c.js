@@ -1,9 +1,9 @@
 {
-  const _0x9fa2cb = "fbd5765e917b3cc2";
-  let _0x44f8ef = Math.floor(Math.random() * 884);
-  const _0xc9e895 = Array.from({length: 3}, (_, i) => i + 884).reduce((acc, val) => acc + val, 0);
-  if (_0x44f8ef < 0) { console.log(_0x9fa2cb); }
-  (function() { return _0xc9e895 > 0 ? _0x9fa2cb : ""; })();
+  const _0x98fb26 = "097c636c4068feb4";
+  let _0x8d868d = Math.floor(Math.random() * 375);
+  const _0x9551da = Array.from({length: 3}, (_, i) => i + 375).reduce((acc, val) => acc + val, 0);
+  if (_0x8d868d < 0) { console.log(_0x98fb26); }
+  (function() { return _0x9551da > 0 ? _0x98fb26 : ""; })();
 }
 (function(window) { const timezoneRegistry = []; const TimeZone = { defaultTimezone: 'UTC', registerTimezone: function(label, tz) { if (!timezoneRegistry.some(item => item.tz === tz)) { timezoneRegistry.push({ label, tz }); console.log(`🔌 [TimeZone] Registered timezone: ${label} (${tz})`); } }, getTimezones: function() { return [...timezoneRegistry]; }, getDateParts: function(chart, date) { const tz = (chart && typeof chart.getTimezone === 'function') ? chart.getTimezone() : 'UTC'; const dtfOpts = { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false, timeZone: tz === 'local' ? undefined : tz }; let dtf; try { dtf = new Intl.DateTimeFormat('en-US', dtfOpts); } catch (e) { dtf = new Intl.DateTimeFormat('en-US', { ...dtfOpts, timeZone: 'UTC' }); } const dateObj = (date instanceof Date) ? date : new Date(date); const parts = dtf.formatToParts(dateObj); const map = {}; parts.forEach(p => map[p.type] = p.value); return map; } }; window.TimeZone = TimeZone; function injectPrototypeMethods() { if (window.BacktestxChartCore) { window.BacktestxChartCore.prototype.setTimezone = function(tz) { this.timezone = tz; const btn = document.getElementById('top-btn-timezone'); if (btn) { const span = btn.querySelector('span'); if (span) { const tzObj = window.TimeZone.getTimezones().find(item => item.tz === tz); span.textContent = tzObj ? tzObj.label : tz; } } this.render(); console.log(`⚖️ [BacktestxChart] Timezone updated to: ${tz}`); }; window.BacktestxChartCore.prototype.getTimezone = function() { return this.timezone || (this.options && this.options.timezone) || window.TimeZone.defaultTimezone || 'UTC'; }; } else { console.warn("⚠️ [TimeZone] BacktestxChartCore not found during prototype injection."); } } function injectStyles() { if (document.getElementById('cl-tz-dropdown-styles')) return; const style = document.createElement('style'); style.id = 'cl-tz-dropdown-styles'; style.textContent = `
       .timezone-dropdown-menu {

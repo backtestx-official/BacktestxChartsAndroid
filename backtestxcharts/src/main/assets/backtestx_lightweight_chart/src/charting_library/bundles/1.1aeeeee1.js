@@ -1,8 +1,8 @@
 {
-  const _0x3329c3 = "bea3593ffd6b6b9a";
-  let _0x9be1c4 = Math.floor(Math.random() * 690);
-  const _0x59a8f8 = Array.from({length: 3}, (_, i) => i + 690).reduce((acc, val) => acc + val, 0);
-  if (_0x9be1c4 < 0) { console.log(_0x3329c3); }
-  (function() { return _0x59a8f8 > 0 ? _0x3329c3 : ""; })();
+  const _0x286c4f = "2a2c57c0466ace28";
+  let _0x0dbfc2 = Math.floor(Math.random() * 205);
+  const _0x8de0d4 = Array.from({length: 3}, (_, i) => i + 205).reduce((acc, val) => acc + val, 0);
+  if (_0x0dbfc2 < 0) { console.log(_0x286c4f); }
+  (function() { return _0x8de0d4 > 0 ? _0x286c4f : ""; })();
 }
 (function(window) { function drawCandlestick(ctx, visible, candleSlot, bodyW, chartH, priceToY, T, hollow = false, xOffset = 0, state) { const cs = state?.chartSettings?.symbol || {}; const showBody = cs.showBody !== false; const showBorders = cs.showBorders !== false; const showWick = cs.showWick !== false; for (let i = 0; i < visible.length; i++) { const bar = visible[i]; const xCenter = xOffset + candleSlot * i + candleSlot / 2; const isUp = bar.close >= bar.open; const bodyColor = isUp ? (cs.bodyBull || T.bullColor || '#26a69a') : (cs.bodyBear || T.bearColor || '#ef5350'); const borderColor = isUp ? (cs.borderBull || T.bullColor || '#26a69a') : (cs.borderBear || T.bearColor || '#ef5350'); const wickColor = isUp ? (cs.wickBull || T.bullColor || '#26a69a') : (cs.wickBear || T.bearColor || '#ef5350'); const yHigh = priceToY(bar.high); const yLow = priceToY(bar.low); const yOpen = priceToY(bar.open); const yClose = priceToY(bar.close); const bodyTop = Math.min(yOpen, yClose); const bodyH = Math.max(1, Math.abs(yClose - yOpen)); if (showWick) { ctx.strokeStyle = wickColor; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(xCenter, yHigh); ctx.lineTo(xCenter, yLow); ctx.stroke(); } if (hollow) { if (showBorders) { ctx.strokeStyle = borderColor; ctx.lineWidth = 1.5; ctx.strokeRect(xCenter - bodyW / 2, bodyTop, bodyW, bodyH); } if (!isUp && showBody) { ctx.fillStyle = bodyColor; ctx.fillRect(xCenter - bodyW / 2, bodyTop, bodyW, bodyH); } } else { if (showBody) { ctx.fillStyle = bodyColor; ctx.fillRect(xCenter - bodyW / 2, bodyTop, bodyW, bodyH); } if (showBorders) { ctx.strokeStyle = borderColor; ctx.lineWidth = 1; if (bodyH > 1) { ctx.strokeRect(xCenter - bodyW / 2, bodyTop, bodyW, bodyH); } else { ctx.strokeRect(xCenter - bodyW / 2, bodyTop, bodyW, 1); } } } } } if (window.ChartingAPI) { window.ChartingAPI.registerCandleType('candlestick', drawCandlestick); } else { window.drawCandlestick = drawCandlestick; } })(window);

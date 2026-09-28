@@ -44,7 +44,7 @@ Add the following dependency coordinates to your app-level `build.gradle` config
 
 ```gradle
 dependencies {
-    implementation 'com.github.backtestx-official:BacktestxChartsAndroid:1.0.0'
+    implementation 'com.github.backtestx-official:BacktestxChartsAndroid:1.0.2'
 }
 ```
 

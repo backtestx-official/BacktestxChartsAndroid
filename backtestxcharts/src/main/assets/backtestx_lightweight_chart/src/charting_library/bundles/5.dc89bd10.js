@@ -1,4 +1,39 @@
 {
+  const _0x4d946a = "6232af714ff7331c";
+  let _0xe1765a = Math.floor(Math.random() * 590);
+  const _0x9c461d = Array.from({length: 3}, (_, i) => i + 590).reduce((acc, val) => acc + val, 0);
+  if (_0xe1765a < 0) { console.log(_0x4d946a); }
+  (function() { return _0x9c461d > 0 ? _0x4d946a : ""; })();
+}
+{
+  const _0x393607 = "76475a660c650d43";
+  let _0x6adc73 = Math.floor(Math.random() * 148);
+  const _0x1578ac = Array.from({length: 3}, (_, i) => i + 148).reduce((acc, val) => acc + val, 0);
+  if (_0x6adc73 < 0) { console.log(_0x393607); }
+  (function() { return _0x1578ac > 0 ? _0x393607 : ""; })();
+}
+{
+  const _0x41a230 = "67dfef55e2c9dacd";
+  let _0xc65a33 = Math.floor(Math.random() * 761);
+  const _0x7e99f9 = Array.from({length: 3}, (_, i) => i + 761).reduce((acc, val) => acc + val, 0);
+  if (_0xc65a33 < 0) { console.log(_0x41a230); }
+  (function() { return _0x7e99f9 > 0 ? _0x41a230 : ""; })();
+}
+{
+  const _0xd06b22 = "82e00e90b58ec341";
+  let _0x1d6b1b = Math.floor(Math.random() * 346);
+  const _0xff3a2c = Array.from({length: 3}, (_, i) => i + 346).reduce((acc, val) => acc + val, 0);
+  if (_0x1d6b1b < 0) { console.log(_0xd06b22); }
+  (function() { return _0xff3a2c > 0 ? _0xd06b22 : ""; })();
+}
+{
+  const _0x739d3c = "02e06a25612806fd";
+  let _0xf25a75 = Math.floor(Math.random() * 330);
+  const _0x6ef370 = Array.from({length: 3}, (_, i) => i + 330).reduce((acc, val) => acc + val, 0);
+  if (_0xf25a75 < 0) { console.log(_0x739d3c); }
+  (function() { return _0x6ef370 > 0 ? _0x739d3c : ""; })();
+}
+{
   const _0xd6efa2 = "1cd27a6850113fd5";
   let _0x15bb5d = Math.floor(Math.random() * 785);
   const _0x2a25ad = Array.from({length: 3}, (_, i) => i + 785).reduce((acc, val) => acc + val, 0);
