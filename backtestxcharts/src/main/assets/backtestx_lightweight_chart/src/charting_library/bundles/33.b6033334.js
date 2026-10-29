@@ -1,9 +1,9 @@
 {
-  const _0xe1a45e = "66cf18520e1df67a";
-  let _0x1bd715 = Math.floor(Math.random() * 411);
-  const _0x355137 = Array.from({length: 3}, (_, i) => i + 411).reduce((acc, val) => acc + val, 0);
-  if (_0x1bd715 < 0) { console.log(_0xe1a45e); }
-  (function() { return _0x355137 > 0 ? _0xe1a45e : ""; })();
+  const _0xa368c8 = "5186b80635841e69";
+  let _0x4ed04d = Math.floor(Math.random() * 262);
+  const _0xccf9ed = Array.from({length: 3}, (_, i) => i + 262).reduce((acc, val) => acc + val, 0);
+  if (_0x4ed04d < 0) { console.log(_0xa368c8); }
+  (function() { return _0xccf9ed > 0 ? _0xa368c8 : ""; })();
 }
 (function(window) {
     class SettingsPopup {
@@ -347,6 +347,12 @@
                     const ts = this.chart.options.chartSettings.timeScale;
                     content.innerHTML = `
                         <div class="bx-settings-section">
+                            <h4>PRICE SCALE</h4>
+                            <div class="bx-settings-row">
+                                <label><input type="checkbox" id="bx-cb-countdown" ${ts.showCountdown !== false ? 'checked' : ''}> Countdown to bar close</label>
+                            </div>
+                        </div>
+                        <div class="bx-settings-section">
                             <h4>TIME SCALE</h4>
                             <div class="bx-settings-row">
                                 <label>Date format</label>
@@ -369,6 +375,11 @@
                         const el = document.getElementById(id);
                         if (el) el.addEventListener('change', (e) => { ts[key] = e.target.value; this.chart.render(); try { localStorage.setItem('bx_chart_settings', JSON.stringify(this.chart.options.chartSettings)); } catch(e) {} });
                     };
+                    const bindCheck = (id, key) => {
+                        const el = document.getElementById(id);
+                        if (el) el.addEventListener('change', (e) => { ts[key] = e.target.checked; this.chart.render(); try { localStorage.setItem('bx_chart_settings', JSON.stringify(this.chart.options.chartSettings)); } catch(e) {} });
+                    };
+                    bindCheck('bx-cb-countdown', 'showCountdown');
                     bindSelect('bx-sel-date-format', 'dateFormat');
                     bindSelect('bx-sel-time-format', 'timeFormat');
                 } else if (tabName === 'Canvas') {
@@ -386,7 +397,7 @@
                                         <option value="solid" ${cv.bgType !== 'gradient' ? 'selected' : ''}>Solid</option>
                                         <option value="gradient" ${cv.bgType === 'gradient' ? 'selected' : ''}>Gradient</option>
                                     </select>
-                                    <input type="color" id="bx-color-bg" value="${cv.bgColor || (document.body.classList.contains('light-theme') ? '#ffffff' : '#131722')}">
+                                    <input type="color" id="bx-color-bg" value="${cv.bgColor || (document.body.classList.contains('light-theme') ? '#ffffff' : '#0f0f0f')}">
                                 </div>
                             </div>
                             <div class="bx-settings-row">

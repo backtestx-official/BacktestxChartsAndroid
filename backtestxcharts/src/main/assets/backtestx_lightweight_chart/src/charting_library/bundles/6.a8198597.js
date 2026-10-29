@@ -1,8 +1,8 @@
 {
-  const _0xf86080 = "ee2c0eb901d766a9";
-  let _0x539f4e = Math.floor(Math.random() * 864);
-  const _0xfe3148 = Array.from({length: 3}, (_, i) => i + 864).reduce((acc, val) => acc + val, 0);
-  if (_0x539f4e < 0) { console.log(_0xf86080); }
-  (function() { return _0xfe3148 > 0 ? _0xf86080 : ""; })();
+  const _0xfb9470 = "30223d92a0a05746";
+  let _0x65b59f = Math.floor(Math.random() * 374);
+  const _0x627d52 = Array.from({length: 3}, (_, i) => i + 374).reduce((acc, val) => acc + val, 0);
+  if (_0x65b59f < 0) { console.log(_0xfb9470); }
+  (function() { return _0x627d52 > 0 ? _0xfb9470 : ""; })();
 }
 (function(window) { function drawPriceScaleDrawingLabel(chart, ctx, minPrice, maxPrice) { if (chart.selectedDrawingIdx === null || chart.selectedDrawingIdx === undefined) return; const d = chart.drawings[chart.selectedDrawingIdx]; if (!d) return; const baseColor = d.color || '#2962ff'; const chartW = chart.logicalWidth - chart.paddingRight; const chartH = chart.logicalHeight - chart.paddingBottom; ctx.save(); ctx.font = 'bold 10px Inter, Arial, sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; const renderBadge = (price) => { const y = chart.priceToY(price, minPrice, maxPrice); if (y < 0 || y > chartH) return;  const labelH = 18; const labelW = chart.paddingRight; const labelX = chartW + 1; const labelY = y - labelH / 2; ctx.fillStyle = baseColor; ctx.beginPath(); if (ctx.roundRect) { ctx.roundRect(labelX, labelY, labelW - 1, labelH, [0, 3, 3, 0]); } else { ctx.rect(labelX, labelY, labelW - 1, labelH); } ctx.fill(); ctx.fillStyle = '#ffffff'; ctx.fillText(price.toFixed(2), labelX + 8, y); }; if (d.p1) renderBadge(d.p1.price); if (d.p2) renderBadge(d.p2.price); ctx.restore(); } if (window.ChartingAPI) { if (window.ChartingAPI.registerPriceScaleDrawingLabel) { window.ChartingAPI.registerPriceScaleDrawingLabel(drawPriceScaleDrawingLabel); } else { window.ChartingAPI.drawPriceScaleDrawingLabel = drawPriceScaleDrawingLabel; } } window.drawPriceScaleDrawingLabel = drawPriceScaleDrawingLabel; })(window);

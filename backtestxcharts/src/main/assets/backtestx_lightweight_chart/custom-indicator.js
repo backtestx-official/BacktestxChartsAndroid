@@ -6,7 +6,7 @@
   }
 
   /*
-   *  HOW USERS REGISTER CUSTOM INDICATORS:
+   * 💡 HOW USERS REGISTER CUSTOM INDICATORS:
    * 
    * Call the ChartingAPI to register a technical indicator:
    * 
@@ -134,6 +134,39 @@
         }
       }
       ctx.stroke();
+      ctx.restore();
+    }
+  });
+
+  // ─── 3. Built-in Volume Indicator with Bull/Bear Color Synchronization ───
+  window.ChartingAPI.registerIndicator('volume', {
+    name: 'Volume',
+    type: 'pane',
+    levels: [0],
+    params: {},
+    defaultColor: '#26a69a',
+    calculate: function(bars) {
+      return bars.map(b => b.volume || 0);
+    },
+    render: function(ctx, chart, values, bounds) {
+      const { startIndex, endIndex, chartH, panelY, toY } = bounds;
+      const barW = Math.max(1, chart.candleWidth * 0.85);
+
+      ctx.save();
+      for (let i = startIndex; i <= endIndex; i++) {
+        if (i < 0 || i >= chart.bars.length) continue;
+        const bar = chart.bars[i];
+        const vol = values[i] || 0;
+        const x = chart.barToX(i);
+        const y = toY(vol);
+        const isUp = bar.close >= bar.open;
+        const col = isUp ? 'rgba(38, 166, 154, 0.75)' : 'rgba(239, 83, 80, 0.75)';
+
+        ctx.fillStyle = col;
+        const baseY = panelY + chartH;
+        const h = Math.max(1, baseY - y);
+        ctx.fillRect(x - barW / 2, y, barW, h);
+      }
       ctx.restore();
     }
   });

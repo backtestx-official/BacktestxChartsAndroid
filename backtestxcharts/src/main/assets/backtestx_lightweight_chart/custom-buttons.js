@@ -5,22 +5,21 @@
     return;
   }
 
-  /*
-   *  HOW USERS ADD CUSTOM TOOLBAR BUTTONS MANUALLY:
-   * 
-   * 1. Register the button:
-   *    window.ChartingAPI.registerTopToolbarButton('my_action_id', {
-   *       label: 'My Button Text',                      // Display text
-   *       tooltip: 'Hover text helper',                 // (Optional) tooltip text
-   *       alignment: 'left' | 'right',                  // Placement side ('left' is default)
-   *       iconSvg: '<svg width="14" height="14" ...>',  // (Optional) inline SVG icon string
-   *       onClick: function(chart, buttonElement, event) {
-   *          // Define your action here using the 'chart' instance!
-   *          // Example: chart.drawings = []; chart.render(); // Clear drawings
-   *       }
-   *    });
-   * 
-   * 2. Enjoy! The top-toolbar.js module will automatically detect it,
-   *    render it, and wire the action handlers.
-   */
+  // ─── Register 1-Click Screenshot / Export PNG Button ───
+  window.ChartingAPI.registerTopToolbarButton('btn_screenshot', {
+    label: '',
+    tooltip: 'Take a snapshot (Download PNG)',
+    alignment: 'right',
+    iconSvg: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+      <circle cx="12" cy="13" r="4"></circle>
+    </svg>`,
+    onClick: function(chart) {
+      if (chart && typeof chart.takeScreenshot === 'function') {
+        chart.takeScreenshot(true);
+      }
+    }
+  });
+
+  console.log("🔌 [custom-buttons.js] Loaded and registered custom buttons successfully.");
 })(window);

@@ -1,8 +1,8 @@
 {
-  const _0x1ddcec = "c1ea61a695840a35";
-  let _0x1edfb6 = Math.floor(Math.random() * 743);
-  const _0xb98033 = Array.from({length: 3}, (_, i) => i + 743).reduce((acc, val) => acc + val, 0);
-  if (_0x1edfb6 < 0) { console.log(_0x1ddcec); }
-  (function() { return _0xb98033 > 0 ? _0x1ddcec : ""; })();
+  const _0xdaf3f7 = "fc48ac56d3d62c2b";
+  let _0x577ea6 = Math.floor(Math.random() * 680);
+  const _0x8788dd = Array.from({length: 3}, (_, i) => i + 680).reduce((acc, val) => acc + val, 0);
+  if (_0x577ea6 < 0) { console.log(_0xdaf3f7); }
+  (function() { return _0x8788dd > 0 ? _0xdaf3f7 : ""; })();
 }
 (function(window) { function drawTimescaleDrawingLabel(chart, ctx, chartH) { if (chart.selectedDrawingIdx === null || chart.selectedDrawingIdx === undefined) return; const d = chart.drawings[chart.selectedDrawingIdx]; if (!d) return; const baseColor = d.color || '#2962ff'; const chartW = chart.logicalWidth - chart.paddingRight; ctx.save(); ctx.font = 'bold 9.5px Inter, Arial, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; const renderBadge = (point) => { const x = chart.barToX(point.idx); if (x < 0 || x > chartW) return;  let barTime; if (chart.bars.length === 0) return; if (point.idx >= 0 && point.idx < chart.bars.length) { barTime = chart.bars[point.idx].time; } else { const lastBar = chart.bars[chart.bars.length - 1]; const firstBar = chart.bars[0]; const interval = chart.bars.length > 1  ? (lastBar.time - firstBar.time) / (chart.bars.length - 1) : 24 * 60 * 60 * 1000;  if (point.idx >= chart.bars.length) { barTime = lastBar.time + (point.idx - (chart.bars.length - 1)) * interval; } else { barTime = firstBar.time - (0 - point.idx) * interval; } } const dateStr = new Date(barTime).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }); const textW = ctx.measureText(dateStr).width; const labelH = 18; const labelW = textW + 12; const labelX = x - labelW / 2; const labelY = chartH + 1; ctx.fillStyle = baseColor; ctx.beginPath(); if (ctx.roundRect) { ctx.roundRect(labelX, labelY, labelW, labelH, 3); } else { ctx.rect(labelX, labelY, labelW, labelH); } ctx.fill(); ctx.fillStyle = '#ffffff'; ctx.fillText(dateStr, x, chartH + 10); }; if (d.p1) renderBadge(d.p1); if (d.p2) renderBadge(d.p2); ctx.restore(); } if (window.ChartingAPI) { if (window.ChartingAPI.registerTimescaleDrawingLabel) { window.ChartingAPI.registerTimescaleDrawingLabel(drawTimescaleDrawingLabel); } else { window.ChartingAPI.drawTimescaleDrawingLabel = drawTimescaleDrawingLabel; } } window.drawTimescaleDrawingLabel = drawTimescaleDrawingLabel; })(window);

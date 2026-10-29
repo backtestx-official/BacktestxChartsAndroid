@@ -1,9 +1,9 @@
 {
-  const _0x2eb79b = "80bcd37b4c4160d0";
-  let _0x604d17 = Math.floor(Math.random() * 177);
-  const _0x4c3c0b = Array.from({length: 3}, (_, i) => i + 177).reduce((acc, val) => acc + val, 0);
-  if (_0x604d17 < 0) { console.log(_0x2eb79b); }
-  (function() { return _0x4c3c0b > 0 ? _0x2eb79b : ""; })();
+  const _0xfe85c5 = "ddc28c73466f718a";
+  let _0x9aba35 = Math.floor(Math.random() * 236);
+  const _0xd7dc81 = Array.from({length: 3}, (_, i) => i + 236).reduce((acc, val) => acc + val, 0);
+  if (_0x9aba35 < 0) { console.log(_0xfe85c5); }
+  (function() { return _0xd7dc81 > 0 ? _0xfe85c5 : ""; })();
 }
 (function(window) {
   // Standard TradingView Lightweight Charts Constants & Enums

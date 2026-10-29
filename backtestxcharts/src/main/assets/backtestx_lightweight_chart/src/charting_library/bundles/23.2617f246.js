@@ -1,9 +1,9 @@
 {
-  const _0x4dc389 = "e47045bb42fc3949";
-  let _0x72a9ef = Math.floor(Math.random() * 117);
-  const _0x0d1015 = Array.from({length: 3}, (_, i) => i + 117).reduce((acc, val) => acc + val, 0);
-  if (_0x72a9ef < 0) { console.log(_0x4dc389); }
-  (function() { return _0x0d1015 > 0 ? _0x4dc389 : ""; })();
+  const _0xd72a50 = "c19f12b366f10b08";
+  let _0xef4daf = Math.floor(Math.random() * 124);
+  const _0x381d76 = Array.from({length: 3}, (_, i) => i + 124).reduce((acc, val) => acc + val, 0);
+  if (_0xef4daf < 0) { console.log(_0xd72a50); }
+  (function() { return _0x381d76 > 0 ? _0xd72a50 : ""; })();
 }
 (function(window) {
   const resolutionToMs = (resolution) => {
@@ -105,6 +105,9 @@
       this._lastTouchDist = null;
       this._pinchCenterX = undefined;
       this._pinchCenterY = undefined;
+      this._touchHoldTimeout = null;
+      this._pendingCrosshair = false;
+      this._isCrosshairActiveMobile = false;
 
       this.logoUrl = '';
       this.logoLoaded = false;
@@ -115,6 +118,7 @@
       this.watermarkExpandedWidth = 142;
 
       this.smartLoader = window.SmartLoader ? new window.SmartLoader(this) : null;
+      this._bindToolbarButtons();
       this._initEvents();
 
       if (this.datafeed) {
@@ -132,11 +136,170 @@
         }
       }
 
+      this.isAutoFollowing = true;
+      this._countdownInterval = setInterval(() => {
+        if (this.bars && this.bars.length > 0) {
+          this.render();
+        }
+      }, 1000);
+      this._ensureRealtimeButton();
+
       const btn = document.getElementById("top-btn-interval");
       if (btn) {
         const span = btn.querySelector("span");
         if (span) span.textContent = this.resolution;
       }
+    }
+
+    _ensureRealtimeButton() {
+      if (!this.container || this._realtimeBtn) return;
+      const btn = document.createElement('button');
+      btn.className = 'bx-realtime-btn';
+      btn.title = 'Scroll to latest bar';
+      btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="13 17 18 12 13 7"></polyline><polyline points="6 17 11 12 6 7"></polyline></svg>`;
+      btn.style.cssText = `
+        position: absolute;
+        right: ${this.paddingRight + 12}px;
+        bottom: ${this.paddingBottom + 12}px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(30, 34, 45, 0.88);
+        color: #d1d4dc;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 100;
+        transition: transform 0.15s ease, background 0.15s ease;
+      `;
+      btn.addEventListener('mouseenter', () => {
+        btn.style.transform = 'scale(1.1)';
+        btn.style.background = '#2962ff';
+        btn.style.color = '#ffffff';
+      });
+      btn.addEventListener('mouseleave', () => {
+        btn.style.transform = 'scale(1.0)';
+        btn.style.background = 'rgba(30, 34, 45, 0.88)';
+        btn.style.color = '#d1d4dc';
+      });
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.scrollToRealTime();
+      });
+      this.container.style.position = 'relative';
+      this.container.appendChild(btn);
+      this._realtimeBtn = btn;
+    }
+
+    setActiveTool(tool) {
+      this._drawingP1Placed = false;
+      this._touch1Completed = false;
+      const toolBtns = document.querySelectorAll('.tool-btn');
+      if (this.activeTool === tool) {
+        this.activeTool = null;
+        this.drawingPoints = [];
+        toolBtns.forEach(b => {
+          if (b.getAttribute('data-tool') === tool) b.classList.remove('active');
+        });
+      } else {
+        toolBtns.forEach(b => {
+          if (b.getAttribute('data-tool') !== 'magnet') {
+            b.classList.toggle('active', b.getAttribute('data-tool') === tool);
+          }
+        });
+        this.activeTool = tool;
+        this.drawingPoints = [];
+        this._isCrosshairActiveMobile = false;
+        this.selectedDrawingIdx = null;
+        if (window.DrawingFloatingToolbar) window.DrawingFloatingToolbar.hide();
+      }
+      this.render();
+    }
+
+    _bindToolbarButtons() {
+      const setup = () => {
+        const toolBtns = document.querySelectorAll('.tool-btn');
+        toolBtns.forEach(btn => {
+          const tool = btn.getAttribute('data-tool');
+          const id = btn.id;
+          if (tool && tool !== 'magnet') {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              this.setActiveTool(tool);
+            });
+          } else if (id === 'btn-magnet') {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              this.toggleMagnetMode();
+            });
+          } else if (id === 'btn-reset-view') {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              this.resetView();
+            });
+          } else if (id === 'btn-clear-drawings') {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              this.drawings = [];
+              this.selectedDrawingIdx = null;
+              this.drawingPoints = [];
+              if (window.ChartingAPI && typeof window.ChartingAPI.saveDrawings === 'function') {
+                window.ChartingAPI.saveDrawings(this);
+              }
+              if (window.DrawingFloatingToolbar) window.DrawingFloatingToolbar.hide();
+              this.render();
+            });
+          }
+        });
+
+        if (this.container) {
+          this.container.addEventListener('tool-deactivated', () => {
+            toolBtns.forEach(b => {
+              if (b.getAttribute('data-tool') !== 'magnet') b.classList.remove('active');
+            });
+          });
+        }
+      };
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setup);
+      } else {
+        setup();
+      }
+    }
+
+    _updateRealtimeButton() {
+      if (!this._realtimeBtn) return;
+      const initialOffset = this._getInitialOffset();
+      const slot = this.candleWidth + this.candleGap;
+      const isScrolledAway = Math.abs(this.offset - initialOffset) > (slot * 2);
+      if (isScrolledAway) {
+        this.isAutoFollowing = false;
+        this._realtimeBtn.style.display = 'flex';
+      } else {
+        this.isAutoFollowing = true;
+        this._realtimeBtn.style.display = 'none';
+      }
+    }
+
+    scrollToRealTime() {
+      this.offset = this._getInitialOffset();
+      this.isAutoFollowing = true;
+      this._clampOffset();
+      this.render();
+      this._emitRangeChange();
+      this._updateRealtimeButton();
+    }
+
+    toggleMagnetMode() {
+      this.crosshairMode = this.crosshairMode === 'magnet' ? 'normal' : 'magnet';
+      const btn = document.getElementById('btn-magnet');
+      if (btn) btn.classList.toggle('active', this.crosshairMode === 'magnet');
+      this.render();
+      return this.crosshairMode === 'magnet';
     }
 
     // ─── Lightweight Charts Public APIs ─────────────────────────────────────────
@@ -149,7 +312,7 @@
         setVisibleLogicalRange: (range) => window.TimeScale.setVisibleLogicalRange(self, range),
         fitContent: () => window.TimeScale.fitContent(self),
         scrollToPosition: (pos, animated) => window.TimeScale.scrollToPosition(self, pos, animated),
-        scrollToRealTime: () => window.TimeScale.scrollToRealTime(self),
+        scrollToRealTime: () => self.scrollToRealTime(),
         timeToCoordinate: (time) => window.TimeScale.timeToCoordinate(self, time),
         coordinateToTime: (x) => window.TimeScale.coordinateToTime(self, x),
         logicalToCoordinate: (logical) => window.TimeScale.logicalToCoordinate(self, logical),
@@ -226,12 +389,20 @@
       return false;
     }
 
-    takeScreenshot() {
+    takeScreenshot(download = false) {
       const offscreen = document.createElement('canvas');
       offscreen.width = this.canvas.width;
       offscreen.height = this.canvas.height;
       const offCtx = offscreen.getContext('2d');
       offCtx.drawImage(this.canvas, 0, 0);
+      if (download) {
+        const a = document.createElement('a');
+        a.href = offscreen.toDataURL('image/png');
+        a.download = `${this.symbol || 'chart'}_${this.resolution || '1D'}_${Date.now()}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
       return offscreen;
     }
 
@@ -324,6 +495,15 @@
       this._watermarkAnimFrame = requestAnimationFrame(tick);
     }
 
+    _isPointInWatermark(x, y) {
+      const chartH = typeof this.getChartHeight === 'function' ? this.getChartHeight() : this.logicalHeight - this.paddingBottom;
+      const badgeX = 12;
+      const badgeY = chartH - 46;
+      const badgeH = 34;
+      const badgeW = this.watermarkExpanded ? (this.watermarkExpandedWidth || 165) : badgeH;
+      return x >= badgeX && x <= (badgeX + badgeW) && y >= badgeY && y <= (badgeY + badgeH);
+    }
+
     resetView() {
       this.candleWidth = 8;
       this.offset = this._getInitialOffset();
@@ -339,22 +519,25 @@
       if (!this.bars || this.bars.length === 0) return;
       const chartW = this.logicalWidth - this.paddingRight;
       const slot = this.candleWidth + this.candleGap;
-      const visibleCount = Math.max(1, Math.floor(chartW / slot));
-      const maxFuture = Math.max(100, Math.floor(visibleCount * 0.9));
-      const maxStart = this.bars.length - Math.max(1, visibleCount - maxFuture);
-      const minStart = -Math.floor(visibleCount * 0.8);
+      const visibleCount = Math.max(2, Math.floor(chartW / slot));
+
+      // Match core library terminal/src/interactions.js lines 2493-2498
+      const minCandlesVisible = this.bars.length >= 2 ? Math.min(this.bars.length, Math.max(2, Math.min(5, Math.floor(visibleCount * 0.2)))) : 1;
+      const maxStart = this.bars.length - minCandlesVisible;
+      const minStart = visibleCount <= 4 ? Math.min(0, 2 - visibleCount) : -Math.max(15, Math.floor(visibleCount * 0.8));
+
       const offsetMin = -maxStart * slot - this.candleWidth / 2;
       const offsetMax = -minStart * slot - this.candleWidth / 2;
 
       if (this.offset < offsetMin) {
         this.offset = offsetMin;
-        if (this.dragMode === 'pan' && e) {
+        if (this.dragMode === 'pan' && e && e.clientX !== undefined) {
           this.panStart.x = e.clientX;
           this.panOffsetStart = this.offset;
         }
       } else if (this.offset > offsetMax) {
         this.offset = offsetMax;
-        if (this.dragMode === 'pan' && e) {
+        if (this.dragMode === 'pan' && e && e.clientX !== undefined) {
           this.panStart.x = e.clientX;
           this.panOffsetStart = this.offset;
         }
@@ -416,8 +599,15 @@
                 this.bars[this.bars.length - 1] = bar;
               } else {
                 this.bars.push(bar);
+                // If user is auto-following the live edge, auto-scroll offset to keep the newly formed candle visible!
+                if (this.isAutoFollowing) {
+                  const slot = this.candleWidth + this.candleGap;
+                  this.offset -= slot;
+                  this._clampOffset();
+                }
               }
               this.render();
+              this._updateRealtimeButton();
             }
           }, this.subUID);
         });
@@ -425,8 +615,15 @@
     }
 
     destroy() {
+      if (this._countdownInterval) {
+        clearInterval(this._countdownInterval);
+        this._countdownInterval = null;
+      }
       if (this.datafeed && this.subUID) {
         this.datafeed.unsubscribeBars(this.subUID);
+      }
+      if (this._realtimeBtn && this._realtimeBtn.parentNode) {
+        this._realtimeBtn.parentNode.removeChild(this._realtimeBtn);
       }
     }
 
@@ -506,6 +703,11 @@
     _initEvents() {
       this.canvas.addEventListener('contextmenu', (e) => {
         e.preventDefault();
+        const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 768);
+        if (isMobile || (Date.now() - (this._lastTouchActiveTime || 0) < 1200) || this._touchHoldTimeout || this._justActivatedCrosshair) {
+          return;
+        }
+
         const existing = document.getElementById('bx-chart-context-menu');
         if (existing) existing.remove();
 
@@ -586,6 +788,29 @@
         const rect = this.canvas.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
+
+        // Check Watermark Logo click / dismissal
+        if (this._isPointInWatermark(mouseX, mouseY)) {
+          if (!this.watermarkExpanded) {
+            this.watermarkExpanded = true;
+            this._watermarkLockedByTouch = true;
+            this._animateWatermark();
+            return;
+          } else {
+            const watermarkLogoSettings = window.ChartingAPI && typeof window.ChartingAPI.getWatermarkLogoSettings === 'function' ? window.ChartingAPI.getWatermarkLogoSettings() : null;
+            const url = watermarkLogoSettings?.clickUrl || 'https://backtestx.in';
+            if (url) window.open(url, '_blank');
+            return;
+          }
+        } else {
+          // Clicked anywhere on the chart canvas -> dismiss watermark text ("will gone")
+          if (this.watermarkExpanded) {
+            this.watermarkExpanded = false;
+            this._watermarkLockedByTouch = false;
+            this._animateWatermark();
+          }
+        }
+
         const { minPrice, maxPrice } = this.getVisibleMinMax();
         const clickedBar = this.xToBar(mouseX);
         const clickedPrice = this.yToPrice(mouseY, minPrice, maxPrice);
@@ -598,6 +823,10 @@
           seriesData: this.bars[clickedBar] || null
         };
         this._clickListeners.forEach(fn => { try { fn(clickEvent); } catch(_) {} });
+
+        if (this._isCrosshairActiveMobile) {
+          this._isCrosshairActiveMobile = false;
+        }
 
         if (this.activeTool) {
           const customTool = window.ChartingAPI ? window.ChartingAPI.getCustomDrawing(this.activeTool) : null;
@@ -622,12 +851,14 @@
             this.selectedDrawingIdx = this.drawings.length - 1;
             this.activeTool = null;
             this.drawingPoints = [];
+            this.dragMode = null;
             this.container.dispatchEvent(new CustomEvent('tool-deactivated'));
           } else {
             if (this.drawingPoints.length === 0) {
               this.drawingPoints.push({
                 idx: clickedBar, price: clickedPrice, time: this.bars[clickedBar] ? this.bars[clickedBar].time : null
               });
+              this.dragMode = 'drawingPreview';
             } else {
               this.drawings.push({
                 type: this.activeTool,
@@ -640,6 +871,9 @@
               this.selectedDrawingIdx = this.drawings.length - 1;
               this.drawingPoints = [];
               this.activeTool = null;
+              this.dragMode = null;
+              this._drawingP1Placed = false;
+              this._touch1Completed = false;
               this.container.dispatchEvent(new CustomEvent('tool-deactivated'));
             }
           }
@@ -704,6 +938,19 @@
         this.mousePos.y = e.clientY - rect.top;
         this.isMouseOver = true;
 
+        // Hover expansion on Watermark Logo
+        const isOverWatermark = this._isPointInWatermark(this.mousePos.x, this.mousePos.y);
+        if (isOverWatermark) {
+          this.canvas.style.cursor = 'pointer';
+          if (!this.watermarkExpanded) {
+            this.watermarkExpanded = true;
+            this._animateWatermark();
+          }
+        } else if (this.watermarkExpanded && !this._watermarkLockedByTouch && !this.dragMode) {
+          this.watermarkExpanded = false;
+          this._animateWatermark();
+        }
+
         // Magnet mode support
         if (this.crosshairMode === 'magnet' && this.bars && this.bars.length > 0) {
           const hoverBarIdx = this.xToBar(this.mousePos.x);
@@ -729,25 +976,20 @@
         }
 
         // Fire crosshair move listeners
-        const hoverIdx = this.xToBar(this.mousePos.x);
-        const crosshairEvent = {
-          time: this.bars[hoverIdx]?.time || null,
-          logical: hoverIdx,
-          point: { x: this.mousePos.x, y: this.mousePos.y },
-          seriesData: this.bars[hoverIdx] || null
-        };
-        this._crosshairMoveListeners.forEach(fn => { try { fn(crosshairEvent); } catch(_) {} });
+        this._fireCrosshairEvent(this.mousePos.x, this.mousePos.y);
 
         if (this.dragMode === 'priceScale') {
           const dy = e.clientY - this.panStart.y;
-          const factor = Math.exp(-dy * 0.0015);
-          this.priceScaleZoom = Math.max(0.1, Math.min(20, this._priceAxisStartZoom * factor));
+          const factor = Math.exp(-dy * 0.002);
+          this.priceScaleZoom = Math.max(0.05, Math.min(50, this._priceAxisStartZoom * factor));
           this.render();
         } else if (this.dragMode === 'timeScale') {
           const dx = e.clientX - this.panStart.x;
-          const factor = Math.exp(-dx * 0.003);
-          const newWidth = Math.max(2, Math.min(60, this._timeAxisStartCandleWidth * factor));
+          const factor = Math.exp(-dx * 0.002);
           const chartW = rect.width - this.paddingRight;
+          const maxCandleWidth = Math.max(60, (chartW / 2) - this.candleGap);
+          const minCandleWidth = Math.max(0.5, (chartW / 2000) - this.candleGap);
+          const newWidth = Math.max(minCandleWidth, Math.min(maxCandleWidth, this._timeAxisStartCandleWidth * factor));
           const oldSlot = this._timeAxisStartCandleWidth + this.candleGap;
           const i_pivot = (chartW - this._timeAxisStartOffset - this._timeAxisStartCandleWidth / 2) / oldSlot;
           this.candleWidth = newWidth;
@@ -756,6 +998,7 @@
           this._clampOffset();
           this.render();
           this._emitRangeChange();
+          this._updateRealtimeButton();
         } else if (this.dragMode === 'pan') {
           const dx = e.clientX - this.panStart.x;
           this.offset = this.panOffsetStart + dx;
@@ -766,7 +1009,8 @@
             const priceRange = maxPrice - minPrice;
             const chartH = rect.height - this.paddingBottom;
             const pricePerPx = priceRange / chartH;
-            this.priceScaleOffset = this._dragStartOffset + dy * pricePerPx;
+            const dragMultiplier = this.invertScale ? -1 : 1;
+            this.priceScaleOffset = this._dragStartOffset + dy * pricePerPx * dragMultiplier;
           }
           this.render();
           this._emitRangeChange();
@@ -800,6 +1044,19 @@
             window.DrawingFloatingToolbar.show(this);
           }
         } else {
+          if (!this.dragMode) {
+            const isOverTimeAxis = this.mousePos.y >= (rect.height - this.paddingBottom);
+            const isOverPriceAxis = this.mousePos.x >= (rect.width - this.paddingRight);
+            if (isOverTimeAxis && !isOverPriceAxis) {
+              this.canvas.style.cursor = 'ew-resize';
+            } else if (isOverPriceAxis && !isOverTimeAxis) {
+              this.canvas.style.cursor = 'ns-resize';
+            } else if (isOverWatermark) {
+              this.canvas.style.cursor = 'pointer';
+            } else {
+              this.canvas.style.cursor = 'crosshair';
+            }
+          }
           this.render();
         }
       });
@@ -807,7 +1064,9 @@
       window.addEventListener('mouseup', () => {
         if (this.dragMode) {
           const wasDraggingDrawing = this.dragMode === 'dragDrawing';
-          this.dragMode = null;
+          if (this.dragMode !== 'drawingPreview') {
+            this.dragMode = null;
+          }
           if (window.ChartingAPI && typeof window.ChartingAPI.saveCustomDrawings === 'function') {
             window.ChartingAPI.saveCustomDrawings(this, this.drawings);
           }
@@ -821,6 +1080,10 @@
 
       this.canvas.addEventListener('mouseleave', () => {
         this.isMouseOver = false;
+        if (this.watermarkExpanded && !this._watermarkLockedByTouch) {
+          this.watermarkExpanded = false;
+          this._animateWatermark();
+        }
         this.render();
       });
 
@@ -830,34 +1093,504 @@
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
         const delta = e.deltaY < 0 ? 1 : -1;
+        const chartW = rect.width - this.paddingRight;
+        const chartH = rect.height - this.paddingBottom;
 
-        if (mouseX >= rect.width - this.paddingRight) {
-          const factor = e.deltaY < 0 ? 1.1 : 0.9;
-          this.priceScaleZoom = Math.max(0.1, Math.min(20, (this.priceScaleZoom ?? 1.0) * factor));
+        if (mouseX >= chartW) {
+          const factor = e.deltaY < 0 ? 1.08 : (1 / 1.08);
+          this.priceScaleZoom = Math.max(0.05, Math.min(50, (this.priceScaleZoom ?? 1.0) * factor));
           this.render();
-        } else if (mouseY >= rect.height - this.paddingBottom) {
-          const zoomSpeed = 1.2;
-          const chartW = rect.width - this.paddingRight;
+        } else if (mouseY >= chartH) {
+          const effectiveDelta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? (e.deltaX < 0 ? 1 : -1) : (e.deltaY < 0 ? 1 : -1);
+          const factor = effectiveDelta > 0 ? 1.12 : (1 / 1.12);
+          const maxCandleWidth = Math.max(60, (chartW / 2) - this.candleGap);
+          const minCandleWidth = Math.max(0.5, (chartW / 2000) - this.candleGap);
           const oldWidth = this.candleWidth;
-          this.candleWidth = Math.max(2, Math.min(60, this.candleWidth + delta * zoomSpeed));
-          const slot = oldWidth + this.candleGap;
-          const i_pivot = (chartW - this.offset - oldWidth / 2) / slot;
-          const newSlot = this.candleWidth + this.candleGap;
-          this.offset = chartW - i_pivot * newSlot - this.candleWidth / 2;
-          this._clampOffset();
-          this.render();
-          this._emitRangeChange();
+          const newWidth = Math.max(minCandleWidth, Math.min(maxCandleWidth, oldWidth * factor));
+          if (Math.abs(newWidth - oldWidth) > 0.001) {
+            const oldSlot = oldWidth + this.candleGap;
+            const i_pivot = (chartW - this.offset - oldWidth / 2) / oldSlot;
+            this.candleWidth = newWidth;
+            const newSlot = this.candleWidth + this.candleGap;
+            this.offset = chartW - i_pivot * newSlot - this.candleWidth / 2;
+            this._clampOffset();
+            this.render();
+            this._emitRangeChange();
+            this._updateRealtimeButton();
+          }
         } else {
-          const mouseBar = this.xToBar(mouseX);
-          const zoomSpeed = 1.2;
-          this.candleWidth = Math.max(2, Math.min(60, this.candleWidth + delta * zoomSpeed));
-          const newSlot = this.candleWidth + this.candleGap;
-          this.offset = mouseX - mouseBar * newSlot - this.candleWidth / 2;
-          this._clampOffset();
-          this.render();
-          this._emitRangeChange();
+          const factor = delta > 0 ? 1.12 : (1 / 1.12);
+          const maxCandleWidth = Math.max(60, (chartW / 2) - this.candleGap);
+          const minCandleWidth = Math.max(0.5, (chartW / 2000) - this.candleGap);
+          const oldWidth = this.candleWidth;
+          const newWidth = Math.max(minCandleWidth, Math.min(maxCandleWidth, oldWidth * factor));
+          if (Math.abs(newWidth - oldWidth) > 0.001) {
+            const mouseBar = this.xToBar(mouseX);
+            this.candleWidth = newWidth;
+            const newSlot = this.candleWidth + this.candleGap;
+            this.offset = mouseX - mouseBar * newSlot - this.candleWidth / 2;
+            this._clampOffset();
+            this.render();
+            this._emitRangeChange();
+            this._updateRealtimeButton();
+          }
         }
       }, { passive: false });
+
+      // ─── Touch Events (Mobile Hold Crosshair, Drawing Preview, Stabilized Pinch & Pan) ─────────
+      let _lastTapTime = 0;
+      let _lastTapX = 0;
+      let _lastTapY = 0;
+
+      this.canvas.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+          const t = e.touches[0];
+          const rect = this.canvas.getBoundingClientRect();
+          const touchX = t.clientX - rect.left;
+          const touchY = t.clientY - rect.top;
+          this._touchStartX = touchX;
+          this._touchStartY = touchY;
+          this._lastTouchX = touchX;
+          this._lastTouchY = touchY;
+          this.panStart.x = t.clientX;
+          this.panStart.y = t.clientY;
+          this.panOffsetStart = this.offset;
+          this._dragStartOffset = this.priceScaleOffset ?? 0;
+          this._isTap = true;
+          this._lastTouchDist = null;
+          this.isMouseOver = true;
+
+          // Watermark Tap Handling on Mobile
+          if (this._isPointInWatermark(touchX, touchY)) {
+            e.preventDefault();
+            if (!this.watermarkExpanded) {
+              this.watermarkExpanded = true;
+              this._watermarkLockedByTouch = true;
+              this._animateWatermark();
+            } else {
+              const watermarkLogoSettings = window.ChartingAPI && typeof window.ChartingAPI.getWatermarkLogoSettings === 'function' ? window.ChartingAPI.getWatermarkLogoSettings() : null;
+              const url = watermarkLogoSettings?.clickUrl || 'https://backtestx.in';
+              if (url) window.open(url, '_blank');
+            }
+            return;
+          } else {
+            // Tapped on chart canvas outside watermark -> dismiss ("will gone")
+            if (this.watermarkExpanded) {
+              this.watermarkExpanded = false;
+              this._watermarkLockedByTouch = false;
+              this._animateWatermark();
+            }
+          }
+
+          // Double tap detection
+          const now = Date.now();
+          if (now - _lastTapTime < 300 && Math.hypot(touchX - _lastTapX, touchY - _lastTapY) < 25) {
+            _lastTapTime = 0;
+            if (this._touchHoldTimeout) {
+              clearTimeout(this._touchHoldTimeout);
+              this._touchHoldTimeout = null;
+            }
+            if (touchX >= (rect.width - this.paddingRight)) {
+              this.priceScaleOffset = 0;
+              this.priceScaleZoom = 1.0;
+              this.render();
+            } else if (touchY >= (rect.height - this.paddingBottom)) {
+              this.resetView();
+            }
+            return;
+          }
+          _lastTapTime = now;
+          _lastTapX = touchX;
+          _lastTapY = touchY;
+
+          // 1. Drawing Tool is Active on Mobile
+          if (this.activeTool) {
+            e.preventDefault();
+            this._isCrosshairActiveMobile = false;
+            const { minPrice, maxPrice } = this.getVisibleMinMax();
+            const clickedBar = this.xToBar(touchX);
+            const clickedPrice = this.yToPrice(touchY, minPrice, maxPrice);
+
+            const customTool = window.ChartingAPI ? window.ChartingAPI.getCustomDrawing(this.activeTool) : null;
+            const isOneClick = customTool ? customTool.clicks === 1 : ['hline', 'vline', 'hray', 'crossline', 'text'].includes(this.activeTool);
+
+            if (isOneClick) {
+              if (this.activeTool === 'text') {
+                const txt = prompt("Enter text for label:") || "Text";
+                this.drawings.push({
+                  type: 'text',
+                  p1: { idx: clickedBar, price: clickedPrice, time: this.bars[clickedBar] ? this.bars[clickedBar].time : null },
+                  text: txt
+                });
+              } else {
+                this.drawings.push({
+                  type: this.activeTool,
+                  p1: { idx: clickedBar, price: clickedPrice, time: this.bars[clickedBar] ? this.bars[clickedBar].time : null }
+                });
+              }
+              if (window.ChartingAPI && typeof window.ChartingAPI.saveCustomDrawings === 'function') {
+                window.ChartingAPI.saveCustomDrawings(this, this.drawings);
+              }
+              this.selectedDrawingIdx = this.drawings.length - 1;
+              this.activeTool = null;
+              this.drawingPoints = [];
+              this.dragMode = null;
+              this._drawingP1Placed = false;
+              this._touch1Completed = false;
+              this.container.dispatchEvent(new CustomEvent('tool-deactivated'));
+              this.render();
+              if (window.DrawingFloatingToolbar) window.DrawingFloatingToolbar.show(this);
+            } else {
+              // Two-point drawing tool (trendline, arrow, ray, rect, circle, fib, etc.)
+              if (!this._drawingP1Placed || this.drawingPoints.length === 0) {
+                // Touch 1: Place Point 1
+                this.drawingPoints = [{
+                  idx: clickedBar, price: clickedPrice, time: this.bars[clickedBar] ? this.bars[clickedBar].time : null
+                }];
+                this.mousePos.x = touchX;
+                this.mousePos.y = touchY;
+                this.dragMode = 'drawingPreview';
+                this._drawingP1Placed = true;
+                this._touch1Completed = false;
+                this.render();
+              } else {
+                // Touch 2: Update preview position towards Point 2
+                this.mousePos.x = touchX;
+                this.mousePos.y = touchY;
+                this.dragMode = 'drawingPreview';
+                this.render();
+              }
+            }
+            return;
+          }
+
+          // 2. Axis Drag Checks
+          const isOverPriceAxis = touchX >= (rect.width - this.paddingRight);
+          const isOverTimeAxis = touchY >= (rect.height - this.paddingBottom);
+          if (isOverPriceAxis) {
+            this.dragMode = 'priceScale';
+            this.panStart.y = t.clientY;
+            this._priceAxisStartZoom = this.priceScaleZoom ?? 1.0;
+            this._dragStartOffset = this.priceScaleOffset ?? 0;
+            return;
+          } else if (isOverTimeAxis) {
+            this.dragMode = 'timeScale';
+            this.panStart.x = t.clientX;
+            this._timeAxisStartCandleWidth = this.candleWidth;
+            this._timeAxisStartOffset = this.offset;
+            return;
+          }
+
+          // 3. Existing Drawing Hit Test
+          const { minPrice, maxPrice } = this.getVisibleMinMax();
+          const hit = window.Drawings ? window.Drawings.hitTest(this, touchX, touchY, minPrice, maxPrice) : null;
+          if (hit) {
+            const d = this.drawings[hit.drawingIdx];
+            this.selectedDrawingIdx = hit.drawingIdx;
+            if (d && !d.locked) {
+              const clickedBar = this.xToBar(touchX);
+              const clickedPrice = this.yToPrice(touchY, minPrice, maxPrice);
+              this.dragMode = 'dragDrawing';
+              this.dragTarget = hit;
+              this.dragStartP1 = { ...d.p1 };
+              this.dragStartP2 = d.p2 ? { ...d.p2 } : null;
+              this.dragStartMouse = { bar: clickedBar, price: clickedPrice };
+            }
+            this.render();
+            if (window.DrawingFloatingToolbar) window.DrawingFloatingToolbar.show(this);
+            return;
+          } else if (this.selectedDrawingIdx !== null) {
+            this.selectedDrawingIdx = null;
+            if (window.DrawingFloatingToolbar) window.DrawingFloatingToolbar.hide();
+            this.render();
+          }
+
+          // 4. Crosshair handling vs Pan on Chart
+          this._lastTouchActiveTime = Date.now();
+          if (this._isCrosshairActiveMobile) {
+            this.dragMode = 'crosshair';
+            this._isCrosshairDragging = true;
+            this._isTap = true;
+            this._lastTouchX = touchX;
+            this._lastTouchY = touchY;
+            return;
+          } else {
+            this.dragMode = 'pan';
+            this._isCrosshairDragging = false;
+            this._justActivatedCrosshair = false;
+            if (this._touchHoldTimeout) clearTimeout(this._touchHoldTimeout);
+            this._pendingCrosshair = true;
+            this._touchHoldTimeout = setTimeout(() => {
+              if (this._pendingCrosshair) {
+                this._touchHoldTimeout = null;
+                this._pendingCrosshair = false;
+                this._isCrosshairActiveMobile = true;
+                this._isCrosshairDragging = true;
+                this._justActivatedCrosshair = true;
+                this._isTap = false;
+                this.dragMode = 'crosshair';
+                this.mousePos.x = touchX;
+                this.mousePos.y = touchY;
+                if (navigator.vibrate) {
+                  try { navigator.vibrate(15); } catch (_) {}
+                }
+                this._fireCrosshairEvent(touchX, touchY);
+                this.render();
+              }
+            }, 400);
+          }
+
+        } else if (e.touches.length === 2) {
+          this._lastTouchActiveTime = Date.now();
+          if (this._isCrosshairActiveMobile) {
+            this._isCrosshairActiveMobile = false;
+          }
+          if (this._touchHoldTimeout) {
+            clearTimeout(this._touchHoldTimeout);
+            this._touchHoldTimeout = null;
+          }
+          this._pendingCrosshair = false;
+          this._isCrosshairDragging = false;
+          this._justActivatedCrosshair = false;
+
+          if (this.watermarkExpanded) {
+            this.watermarkExpanded = false;
+            this._watermarkLockedByTouch = false;
+            this._animateWatermark();
+          }
+
+          this.dragMode = 'pinchZoom';
+          const t1 = e.touches[0];
+          const t2 = e.touches[1];
+          this._lastTouchDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+          const rect = this.canvas.getBoundingClientRect();
+          const midX = ((t1.clientX + t2.clientX) / 2) - rect.left;
+          this._pinchCenterX = midX;
+          this._pinchCenterY = ((t1.clientY + t2.clientY) / 2) - rect.top;
+          this._pinchPivotBar = this.xToBar(midX);
+        }
+      }, { passive: false });
+
+      this.canvas.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        this._lastTouchActiveTime = Date.now();
+        const rect = this.canvas.getBoundingClientRect();
+
+        if (e.touches.length === 1 && this.dragMode) {
+          const t = e.touches[0];
+          const touchX = t.clientX - rect.left;
+          const touchY = t.clientY - rect.top;
+          this._lastTouchX = touchX;
+          this._lastTouchY = touchY;
+          const dx = t.clientX - this.panStart.x;
+          const dy = t.clientY - this.panStart.y;
+          const dist = Math.hypot(dx, dy);
+
+          if (this._pendingCrosshair && dist > 10) {
+            this._pendingCrosshair = false;
+            if (this._touchHoldTimeout) {
+              clearTimeout(this._touchHoldTimeout);
+              this._touchHoldTimeout = null;
+            }
+          }
+          if (dist > 5) {
+            this._isTap = false;
+          }
+
+          if (this.dragMode === 'drawingPreview' || (this.activeTool && this.drawingPoints && this.drawingPoints.length === 1)) {
+            this.mousePos.x = touchX;
+            this.mousePos.y = touchY;
+            this.render();
+          } else if (this.dragMode === 'crosshair' || this._isCrosshairDragging) {
+            const deltaX = touchX - (this._lastTouchX !== undefined ? this._lastTouchX : touchX);
+            const deltaY = touchY - (this._lastTouchY !== undefined ? this._lastTouchY : touchY);
+            this._lastTouchX = touchX;
+            this._lastTouchY = touchY;
+            const chartW = rect.width - this.paddingRight;
+            const chartH = rect.height - this.paddingBottom;
+            const currentX = (this.mousePos && this.mousePos.x !== undefined) ? this.mousePos.x : (chartW / 2);
+            const currentY = (this.mousePos && this.mousePos.y !== undefined) ? this.mousePos.y : (chartH / 2);
+            this.mousePos.x = Math.max(0, Math.min(chartW - 1, currentX + deltaX));
+            this.mousePos.y = Math.max(0, Math.min(chartH - 1, currentY + deltaY));
+            this._fireCrosshairEvent(this.mousePos.x, this.mousePos.y);
+            this.render();
+          } else if (this.dragMode === 'pan') {
+            if (this._isCrosshairActiveMobile && !this._isCrosshairDragging) {
+              this._isCrosshairActiveMobile = false;
+            }
+            this.offset = this.panOffsetStart + dx;
+            this._clampOffset(t);
+            if ((this.priceScaleZoom ?? 1.0) !== 1.0 || (this.priceScaleOffset ?? 0) !== 0) {
+              const { minPrice, maxPrice } = this.getVisibleMinMax();
+              const priceRange = maxPrice - minPrice;
+              const chartH = rect.height - this.paddingBottom;
+              const pricePerPx = priceRange / chartH;
+              const dragMultiplier = this.invertScale ? -1 : 1;
+              this.priceScaleOffset = this._dragStartOffset + dy * pricePerPx * dragMultiplier;
+            }
+            this.render();
+            this._emitRangeChange();
+            this._updateRealtimeButton();
+          } else if (this.dragMode === 'dragDrawing') {
+            const { minPrice, maxPrice } = this.getVisibleMinMax();
+            const currentBar = this.xToBar(touchX);
+            const currentPrice = this.yToPrice(touchY, minPrice, maxPrice);
+            const d = this.drawings[this.dragTarget.drawingIdx];
+            if (this.dragTarget.handle === 'p1') {
+              d.p1.idx = currentBar;
+              d.p1.price = currentPrice;
+              if (this.bars[currentBar]) d.p1.time = this.bars[currentBar].time;
+            } else if (this.dragTarget.handle === 'p2') {
+              d.p2.idx = currentBar;
+              d.p2.price = currentPrice;
+              if (this.bars[currentBar]) d.p2.time = this.bars[currentBar].time;
+            } else if (this.dragTarget.handle === 'line') {
+              const barDiff = currentBar - this.dragStartMouse.bar;
+              const priceDiff = currentPrice - this.dragStartMouse.price;
+              d.p1.idx = this.dragStartP1.idx + barDiff;
+              d.p1.price = this.dragStartP1.price + priceDiff;
+              if (this.bars[d.p1.idx]) d.p1.time = this.bars[d.p1.idx].time;
+              if (d.p2 && this.dragStartP2) {
+                d.p2.idx = this.dragStartP2.idx + barDiff;
+                d.p2.price = this.dragStartP2.price + priceDiff;
+                if (this.bars[d.p2.idx]) d.p2.time = this.bars[d.p2.idx].time;
+              }
+            }
+            this.render();
+            if (window.DrawingFloatingToolbar) window.DrawingFloatingToolbar.show(this);
+          } else if (this.dragMode === 'priceScale') {
+            const factor = Math.exp(-dy * 0.002);
+            this.priceScaleZoom = Math.max(0.05, Math.min(50, (this._priceAxisStartZoom || 1.0) * factor));
+            this.render();
+          } else if (this.dragMode === 'timeScale') {
+            const factor = Math.exp(-dx * 0.002);
+            const chartW = rect.width - this.paddingRight;
+            const maxCandleWidth = Math.max(60, (chartW / 2) - this.candleGap);
+            const minCandleWidth = Math.max(0.5, (chartW / 2000) - this.candleGap);
+            const startWidth = this._timeAxisStartCandleWidth || 8;
+            const newWidth = Math.max(minCandleWidth, Math.min(maxCandleWidth, startWidth * factor));
+            const oldSlot = startWidth + this.candleGap;
+            const i_pivot = (chartW - (this._timeAxisStartOffset || 0) - startWidth / 2) / oldSlot;
+            this.candleWidth = newWidth;
+            const newSlot = this.candleWidth + this.candleGap;
+            this.offset = chartW - i_pivot * newSlot - this.candleWidth / 2;
+            this._clampOffset();
+            this.render();
+            this._emitRangeChange();
+            this._updateRealtimeButton();
+          }
+        } else if (e.touches.length === 2 && this.dragMode === 'pinchZoom') {
+          this._lastTouchActiveTime = Date.now();
+          if (this._isCrosshairActiveMobile) {
+            this._isCrosshairActiveMobile = false;
+          }
+          const t1 = e.touches[0];
+          const t2 = e.touches[1];
+          const newDist = Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+
+          if (this._lastTouchDist && this._lastTouchDist > 0) {
+            const rawRatio = newDist / this._lastTouchDist;
+            const factor = Math.max(0.85, Math.min(1.15, 1 + (rawRatio - 1) * 0.9));
+
+            const chartW = rect.width - this.paddingRight;
+            const maxCandleWidth = Math.max(60, (chartW / 2) - this.candleGap);
+            const minCandleWidth = Math.max(0.5, (chartW / 2000) - this.candleGap);
+            const oldWidth = this.candleWidth;
+            const newWidth = Math.max(minCandleWidth, Math.min(maxCandleWidth, oldWidth * factor));
+            if (Math.abs(newWidth - oldWidth) > 0.02) {
+              const pivotX = this._pinchCenterX ?? (chartW / 2);
+              const pivotBar = this._pinchPivotBar ?? this.xToBar(pivotX);
+              this.candleWidth = newWidth;
+              const newSlot = this.candleWidth + this.candleGap;
+              this.offset = pivotX - pivotBar * newSlot - this.candleWidth / 2;
+              this._clampOffset();
+              this.render();
+              this._emitRangeChange();
+              this._updateRealtimeButton();
+            }
+          }
+          this._lastTouchDist = newDist;
+        }
+      }, { passive: false });
+
+      this.canvas.addEventListener('touchend', (e) => {
+        this._lastTouchActiveTime = Date.now();
+        if (this._touchHoldTimeout) {
+          clearTimeout(this._touchHoldTimeout);
+          this._touchHoldTimeout = null;
+        }
+        this._pendingCrosshair = false;
+
+        if (e.touches.length === 0) {
+          // If two-point drawing is active on mobile
+          if (this.activeTool && this.drawingPoints && this.drawingPoints.length === 1 && this._drawingP1Placed) {
+            if (!this._touch1Completed) {
+              // Touch 1 ended: Point 1 is placed! Wait for Touch 2
+              this._touch1Completed = true;
+              this.render();
+            } else {
+              // Touch 2 ended: Place Point 2 and complete the drawing!
+              const targetX = this._lastTouchX ?? (this.mousePos.x || 0);
+              const targetY = this._lastTouchY ?? (this.mousePos.y || 0);
+              const { minPrice, maxPrice } = this.getVisibleMinMax();
+              const clickedBar = this.xToBar(targetX);
+              const clickedPrice = this.yToPrice(targetY, minPrice, maxPrice);
+
+              this.drawings.push({
+                type: this.activeTool,
+                p1: this.drawingPoints[0],
+                p2: { idx: clickedBar, price: clickedPrice, time: this.bars[clickedBar] ? this.bars[clickedBar].time : null }
+              });
+
+              if (window.ChartingAPI && typeof window.ChartingAPI.saveCustomDrawings === 'function') {
+                window.ChartingAPI.saveCustomDrawings(this, this.drawings);
+              }
+              this.selectedDrawingIdx = this.drawings.length - 1;
+              this.drawingPoints = [];
+              this.activeTool = null;
+              this.dragMode = null;
+              this._drawingP1Placed = false;
+              this._touch1Completed = false;
+              this.container.dispatchEvent(new CustomEvent('tool-deactivated'));
+              this.render();
+              if (window.DrawingFloatingToolbar) window.DrawingFloatingToolbar.show(this);
+            }
+          }
+
+          if (this._justActivatedCrosshair) {
+            // Finger was lifted right after holding to activate crosshair:
+            // DO NOT dismiss! Keep the crosshair visible!
+            this._justActivatedCrosshair = false;
+            this._isCrosshairDragging = false;
+          } else if (this._isCrosshairActiveMobile && this._isTap) {
+            // Subsequent quick tap while crosshair was active -> dismiss crosshair!
+            this._isCrosshairActiveMobile = false;
+            this._isCrosshairDragging = false;
+            this.render();
+          } else {
+            this._isCrosshairDragging = false;
+          }
+
+          if (this.dragMode === 'dragDrawing') {
+            if (window.ChartingAPI && typeof window.ChartingAPI.saveCustomDrawings === 'function') {
+              window.ChartingAPI.saveCustomDrawings(this, this.drawings);
+            }
+          }
+
+          if (this.dragMode !== 'drawingPreview') {
+            this.dragMode = null;
+          }
+          this._lastTouchDist = null;
+          this._updateRealtimeButton();
+        } else if (e.touches.length === 1) {
+          const t = e.touches[0];
+          this.dragMode = 'pan';
+          this.panStart.x = t.clientX;
+          this.panStart.y = t.clientY;
+          this.panOffsetStart = this.offset;
+          this._lastTouchDist = null;
+        }
+      });
 
       this.canvas.addEventListener('dblclick', (e) => {
         const rect = this.canvas.getBoundingClientRect();
@@ -884,6 +1617,17 @@
           }
         }
       });
+    }
+
+    _fireCrosshairEvent(x, y) {
+      const hoverIdx = this.xToBar(x);
+      const crosshairEvent = {
+        time: this.bars[hoverIdx]?.time || null,
+        logical: hoverIdx,
+        point: { x, y },
+        seriesData: this.bars[hoverIdx] || null
+      };
+      this._crosshairMoveListeners.forEach(fn => { try { fn(crosshairEvent); } catch(_) {} });
     }
   }
 

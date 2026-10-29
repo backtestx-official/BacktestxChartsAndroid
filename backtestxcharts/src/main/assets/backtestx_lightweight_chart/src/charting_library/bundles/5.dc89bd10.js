@@ -1,9 +1,23 @@
 {
-  const _0x4d946a = "6232af714ff7331c";
-  let _0xe1765a = Math.floor(Math.random() * 590);
-  const _0x9c461d = Array.from({length: 3}, (_, i) => i + 590).reduce((acc, val) => acc + val, 0);
-  if (_0xe1765a < 0) { console.log(_0x4d946a); }
-  (function() { return _0x9c461d > 0 ? _0x4d946a : ""; })();
+  const _0x45abb7 = "7915ef0d40877eb2";
+  let _0x705c26 = Math.floor(Math.random() * 151);
+  const _0x032708 = Array.from({length: 3}, (_, i) => i + 151).reduce((acc, val) => acc + val, 0);
+  if (_0x705c26 < 0) { console.log(_0x45abb7); }
+  (function() { return _0x032708 > 0 ? _0x45abb7 : ""; })();
+}
+{
+  const _0xd340eb = "baf38056f577da4a";
+  let _0x1ca2f7 = Math.floor(Math.random() * 309);
+  const _0xb2c198 = Array.from({length: 3}, (_, i) => i + 309).reduce((acc, val) => acc + val, 0);
+  if (_0x1ca2f7 < 0) { console.log(_0xd340eb); }
+  (function() { return _0xb2c198 > 0 ? _0xd340eb : ""; })();
+}
+{
+  const _0x6ae8ce = "fb702e09792d8bf4";
+  let _0x1e0aa4 = Math.floor(Math.random() * 116);
+  const _0x395767 = Array.from({length: 3}, (_, i) => i + 116).reduce((acc, val) => acc + val, 0);
+  if (_0x1e0aa4 < 0) { console.log(_0x6ae8ce); }
+  (function() { return _0x395767 > 0 ? _0x6ae8ce : ""; })();
 }
 {
   const _0x393607 = "76475a660c650d43";
@@ -126,8 +140,14 @@
 
     const lastBar = bars[bars.length - 1];
     const intervalMs = resolutionToMs(chart.resolution);
-    const nextCandleTime = lastBar.time + intervalMs;
+    const barTimeMs = lastBar.time < 1e11 ? lastBar.time * 1000 : lastBar.time;
+    const nextCandleTime = barTimeMs + intervalMs;
     let remainingMs = nextCandleTime - Date.now();
+
+    // If tick is delayed or overdue, sync cleanly to the current interval boundary so timer never freezes at 00:00
+    if (isNaN(remainingMs) || remainingMs <= 0) {
+      remainingMs = (Math.ceil(Date.now() / intervalMs) * intervalMs) - Date.now();
+    }
     if (isNaN(remainingMs) || remainingMs < 0) remainingMs = 0;
 
     // Format Countdown String
@@ -166,28 +186,31 @@
     ctx.fillText(livePrice.toFixed(2), labelX + 6, y);
     ctx.restore();
 
-    // Draw Countdown Timer Pill BELOW the Price Badge on the Price Scale (Matches AI folder)
-    const cdLabelH = 16;
-    const cdLabelY = labelY + labelH + 2; // 2px gap below price pill
+    // Draw Countdown Timer Pill BELOW the Price Badge on the Price Scale if enabled
+    const showCountdown = chart.options?.chartSettings?.timeScale?.showCountdown !== false;
+    if (showCountdown) {
+      const cdLabelH = 16;
+      const cdLabelY = labelY + labelH + 2; // 2px gap below price pill
 
-    ctx.save();
-    // Pill background for countdown (theme-aware)
-    ctx.fillStyle = isLight ? '#131722' : '#2a2e39';
-    ctx.beginPath();
-    if (ctx.roundRect) {
-      ctx.roundRect(labelX, cdLabelY, labelW - 1, cdLabelH, 3);
-    } else {
-      ctx.rect(labelX, cdLabelY, labelW - 1, cdLabelH);
+      ctx.save();
+      // Pill background for countdown (theme-aware)
+      ctx.fillStyle = isLight ? '#131722' : '#2a2e39';
+      ctx.beginPath();
+      if (ctx.roundRect) {
+        ctx.roundRect(labelX, cdLabelY, labelW - 1, cdLabelH, 3);
+      } else {
+        ctx.rect(labelX, cdLabelY, labelW - 1, cdLabelH);
+      }
+      ctx.fill();
+
+      // Countdown text (Left-aligned)
+      ctx.font = '10px Inter, Arial, sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(countdownStr, labelX + 6, cdLabelY + cdLabelH / 2);
+      ctx.restore();
     }
-    ctx.fill();
-
-    // Countdown text (Left-aligned)
-    ctx.font = '10px Inter, Arial, sans-serif';
-    ctx.fillStyle = '#ffffff';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(countdownStr, labelX + 6, cdLabelY + cdLabelH / 2);
-    ctx.restore();
   }
 
   if (window.ChartingAPI) {

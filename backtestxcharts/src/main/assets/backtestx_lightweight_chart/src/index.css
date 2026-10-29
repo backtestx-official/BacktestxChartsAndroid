@@ -1,8 +1,8 @@
 :root {
-  --bg-color: #0b0c10;
-  --panel-bg: #151821;
-  --border-color: #242835;
-  --text-main: #f5f6f9;
+  --bg-color: #0f0f0f;
+  --panel-bg: #0f0f0f;
+  --border-color: #2a2e39;
+  --text-main: #d1d4dc;
   --text-muted: #888d9c;
   --accent: #2962ff;
   --accent-hover: #1e53e5;
@@ -87,9 +87,9 @@ body {
 /* Top Toolbar Button styling */
 .top-btn {
   height: 30px;
-  padding: 0 12px;
+  padding: 0 8px;
   background: transparent;
-  border: 1px solid var(--border-color);
+  border: 1px solid transparent;
   border-radius: 4px;
   color: var(--text-main);
   font-size: 12px;
@@ -104,13 +104,18 @@ body {
 }
 
 .top-btn:hover {
-  background: var(--border-color);
-  border-color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: transparent;
+}
+
+body.light-theme .top-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: transparent;
 }
 
 .top-btn.active {
   background: var(--accent-alpha);
-  border-color: var(--accent);
+  border-color: transparent;
   color: var(--accent);
 }
 
@@ -498,7 +503,7 @@ body.light-theme .interval-dropdown-item:hover {
   color: #ffffff !important;
 }
 
-/* Candle Type Dropdown Style */
+/* Candle Type Dropdown Styles */
 .candle-type-dropdown-menu {
   position: absolute;
   background: var(--panel-bg);

@@ -115,4 +115,4 @@ rawWebView.post {
 
 ## License
 
-This project is licensed under the MIT License - see the `LICENSE` file for details.
+This project is open source and licensed under the [Apache License 2.0](LICENSE) (Free & Open Source). See the [LICENSE](LICENSE) file for details.

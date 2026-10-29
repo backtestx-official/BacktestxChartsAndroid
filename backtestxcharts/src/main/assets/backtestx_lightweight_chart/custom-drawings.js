@@ -105,7 +105,7 @@
   });
   
   /*
-   * HOW USERS ADD CUSTOM DRAWINGS MANUALLY:
+   * 💡 HOW USERS ADD CUSTOM DRAWINGS MANUALLY:
    * 
    * 1. Register the tool:
    *    window.ChartingAPI.registerCustomDrawing('my_tool', {
@@ -153,7 +153,12 @@
             </svg>
           `;
 
-          // Insert before the reset button separator if exists
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (window.chart && typeof window.chart.setActiveTool === 'function') {
+              window.chart.setActiveTool(type);
+            }
+          });
           if (resetBtn) {
             const separator = resetBtn.previousElementSibling;
             if (separator && separator.style.height === '1px') {
@@ -168,65 +173,17 @@
       });
     }
 
-    // 1. Toolbar Event Handling for all drawing tools
-    const toolButtons = document.querySelectorAll('.tool-btn[data-tool]');
-    toolButtons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const chart = window.chart;
-        if (!chart) return;
-        const tool = btn.getAttribute('data-tool');
-        
-        if (chart.activeTool === tool) {
-          chart.activeTool = null;
-          chart.drawingPoints = [];
-          btn.classList.remove('active');
-        } else {
-          // Deactivate other buttons first
-          toolButtons.forEach(b => b.classList.remove('active'));
-          
-          chart.activeTool = tool;
-          chart.drawingPoints = [];
-          btn.classList.add('active');
-        }
-        chart.render();
-      });
-    });
-
-    // 2. Listen for drawing completion events (using a slight delay to ensure chart initializes)
+    // Listen for drawing completion events
     setTimeout(() => {
       const chartInstance = window.chart;
       if (chartInstance && chartInstance.container) {
         chartInstance.container.addEventListener('tool-deactivated', () => {
           const toolButtonsInner = document.querySelectorAll('.tool-btn[data-tool]');
-          toolButtonsInner.forEach(b => b.classList.remove('active'));
+          toolButtonsInner.forEach(b => {
+            if (b.getAttribute('data-tool') !== 'magnet') b.classList.remove('active');
+          });
         });
       }
     }, 100);
-
-    // 3. Reset View Action
-    const resetBtnEl = document.getElementById('btn-reset-view');
-    if (resetBtnEl) {
-      resetBtnEl.addEventListener('click', () => {
-        if (window.chart) {
-          window.chart.resetView();
-        }
-      });
-    }
-
-    // 4. Clear Drawings Action
-    const clearBtnEl = document.getElementById('btn-clear-drawings');
-    if (clearBtnEl) {
-      clearBtnEl.addEventListener('click', () => {
-        const chart = window.chart;
-        if (chart) {
-          chart.drawings = [];
-          chart.drawingPoints = [];
-          chart.activeTool = null;
-          const toolButtonsInner = document.querySelectorAll('.tool-btn[data-tool]');
-          toolButtonsInner.forEach(b => b.classList.remove('active'));
-          chart.render();
-        }
-      });
-    }
   });
 })(window);

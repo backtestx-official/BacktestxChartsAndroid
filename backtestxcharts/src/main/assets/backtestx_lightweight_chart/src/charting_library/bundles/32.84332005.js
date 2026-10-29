@@ -1,9 +1,9 @@
 {
-  const _0x0a5bb3 = "91f10351adb3e2e6";
-  let _0x806f29 = Math.floor(Math.random() * 160);
-  const _0x176b83 = Array.from({length: 3}, (_, i) => i + 160).reduce((acc, val) => acc + val, 0);
-  if (_0x806f29 < 0) { console.log(_0x0a5bb3); }
-  (function() { return _0x176b83 > 0 ? _0x0a5bb3 : ""; })();
+  const _0x6d4e23 = "e1f08520199cff99";
+  let _0xa511b3 = Math.floor(Math.random() * 696);
+  const _0x97f17d = Array.from({length: 3}, (_, i) => i + 696).reduce((acc, val) => acc + val, 0);
+  if (_0xa511b3 < 0) { console.log(_0x6d4e23); }
+  (function() { return _0x97f17d > 0 ? _0x6d4e23 : ""; })();
 }
 (function(window) {
   if (!window.BacktestxChartCore) {
@@ -65,8 +65,9 @@
           } else {
             seriesObj.data.push(bar);
           }
-          // Sync with primary bars
-          if (self.bars.length > 0) {
+          // Sync with primary bars only if this series matches the primary chart type
+          const isPrimarySeries = (self.chartType === type) || (self._extraSeries && self._extraSeries.length <= 1);
+          if (isPrimarySeries && self.bars.length > 0) {
             const lastBar = self.bars[self.bars.length - 1];
             if (bar.time === lastBar.time) {
               self.bars[self.bars.length - 1] = {
@@ -257,7 +258,7 @@
 
       const isLight = document.body.classList.contains('light-theme');
       const cvSettingsBg = this.options?.chartSettings?.canvas || {};
-      ctx.fillStyle = cvSettingsBg.bgColor || (isLight ? '#ffffff' : '#131722');
+      ctx.fillStyle = cvSettingsBg.bgColor || (isLight ? '#ffffff' : '#0f0f0f');
       ctx.fillRect(0, 0, W, H);
 
       const psSettings = window.ChartingAPI && typeof window.ChartingAPI.getPriceScaleSettings === 'function' ? window.ChartingAPI.getPriceScaleSettings() : null;
@@ -307,6 +308,18 @@
         });
       }
 
+      // Draw scale dividing borders
+      ctx.save();
+      ctx.strokeStyle = isLight ? '#e0e3eb' : '#2a2e39';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(chartW + 0.5, 0);
+      ctx.lineTo(chartW + 0.5, H);
+      ctx.moveTo(0, chartH + totalPanelsH + 0.5);
+      ctx.lineTo(W, chartH + totalPanelsH + 0.5);
+      ctx.stroke();
+      ctx.restore();
+
       // 2. Draw Chart Series Content (Clipped to main chart viewport)
       ctx.save();
       ctx.beginPath();
@@ -336,7 +349,7 @@
       const startIndex = Math.max(0, Math.min(len - 1, rawStart));
       const endIndex = Math.max(0, Math.min(len - 1, rawEnd));
       const cs = this.options?.chartSettings?.symbol || {};
-      const T = { bullColor: cs.bodyBull || '#26a69a', bearColor: cs.bodyBear || '#ef5350' };
+      const T = { bullColor: cs.bodyBull || '#089981', bearColor: cs.bodyBear || '#f23645' };
 
       // Check chart type: custom vs built-in area / baseline / histogram / candle
       if (this.chartType === 'area') {
@@ -412,7 +425,7 @@
           const x = this.barToX(i);
           const y = this.priceToY(bar.close, minPrice, maxPrice);
           const isUp = bar.close >= (bar.open ?? basePrice);
-          ctx.fillStyle = bar.color || (isUp ? '#26a69a' : '#ef5350');
+          ctx.fillStyle = bar.color || (isUp ? '#089981' : '#f23645');
           const top = Math.min(y, baseY);
           const h = Math.max(1, Math.abs(y - baseY));
           ctx.fillRect(x - bodyW / 2, top, bodyW, h);
@@ -434,12 +447,12 @@
         const showBody = cs.showBody !== false;
         const showBorders = cs.showBorders !== false;
         const showWick = cs.showWick !== false;
-        const bodyBull = cs.bodyBull || '#26a69a';
-        const bodyBear = cs.bodyBear || '#ef5350';
-        const borderBull = cs.borderBull || '#26a69a';
-        const borderBear = cs.borderBear || '#ef5350';
-        const wickBull = cs.wickBull || '#26a69a';
-        const wickBear = cs.wickBear || '#ef5350';
+        const bodyBull = cs.bodyBull || '#089981';
+        const bodyBear = cs.bodyBear || '#f23645';
+        const borderBull = cs.borderBull || '#089981';
+        const borderBear = cs.borderBear || '#f23645';
+        const wickBull = cs.wickBull || '#089981';
+        const wickBear = cs.wickBear || '#f23645';
         const bodyW = this.candleWidth;
 
         if (showWick) {
@@ -680,51 +693,63 @@
           };
           this.logoImg.src = this.logoUrl;
         }
+        ctx.save();
+        const badgeX = 12;
+        const badgeY = chartH - 46;
+        const badgeH = 34;
+        const logoSize = 18;
+        const radius = 17;
+        ctx.font = 'bold 12px Inter, Arial, sans-serif';
+        const text = watermarkLogoSettings.text || 'Chart by BacktestX';
+        const textWidth = ctx.measureText(text).width;
+        const expandedW = 10 + logoSize + 8 + textWidth + 12;
+        this.watermarkExpandedWidth = expandedW;
+        const progress = this.watermarkProgress ?? 0;
+        const badgeW = badgeH + progress * (expandedW - badgeH);
+        const isDarkTheme = !isLight;
+
+        ctx.fillStyle = isDarkTheme ? 'rgba(28, 30, 36, 0.75)' : 'rgba(255, 255, 255, 0.85)';
+        ctx.strokeStyle = isDarkTheme ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.15)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(badgeX, badgeY, badgeW, badgeH, radius);
+        else ctx.rect(badgeX, badgeY, badgeW, badgeH);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.save();
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(badgeX, badgeY, badgeW, badgeH, radius);
+        else ctx.rect(badgeX, badgeY, badgeW, badgeH);
+        ctx.clip();
+        const collapsedLogoX = badgeX + (badgeH - logoSize) / 2;
+        const expandedLogoX = badgeX + 10;
+        const logoX = collapsedLogoX + progress * (expandedLogoX - collapsedLogoX);
+        const logoY = badgeY + (badgeH - logoSize) / 2;
+
         if (this.logoLoaded && this.logoImg) {
-          ctx.save();
-          const badgeX = 12;
-          const badgeY = chartH - 46;
-          const badgeH = 34;
-          const logoSize = 18;
-          const radius = 17;
-          ctx.font = 'bold 12px Inter, Arial, sans-serif';
-          const text = watermarkLogoSettings.text || 'Chart by BacktestX';
-          const textWidth = ctx.measureText(text).width;
-          const expandedW = 10 + logoSize + 8 + textWidth + 12;
-          this.watermarkExpandedWidth = expandedW;
-          const progress = this.watermarkProgress ?? 0;
-          const badgeW = badgeH + progress * (expandedW - badgeH);
-          const isDarkTheme = !isLight;
-
-          ctx.fillStyle = isDarkTheme ? 'rgba(28, 30, 36, 0.75)' : 'rgba(255, 255, 255, 0.85)';
-          ctx.strokeStyle = isDarkTheme ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.15)';
-          ctx.lineWidth = 1;
-          ctx.beginPath();
-          if (ctx.roundRect) ctx.roundRect(badgeX, badgeY, badgeW, badgeH, radius);
-          else ctx.rect(badgeX, badgeY, badgeW, badgeH);
-          ctx.fill();
-          ctx.stroke();
-
-          ctx.save();
-          ctx.beginPath();
-          if (ctx.roundRect) ctx.roundRect(badgeX, badgeY, badgeW, badgeH, radius);
-          else ctx.rect(badgeX, badgeY, badgeW, badgeH);
-          ctx.clip();
-          const collapsedLogoX = badgeX + (badgeH - logoSize) / 2;
-          const expandedLogoX = badgeX + 10;
-          const logoX = collapsedLogoX + progress * (expandedLogoX - collapsedLogoX);
-          const logoY = badgeY + (badgeH - logoSize) / 2;
           try {
             ctx.drawImage(this.logoImg, logoX, logoY, logoSize, logoSize);
           } catch (e) {}
-          ctx.fillStyle = isDarkTheme ? '#ffffff' : '#131722';
-          ctx.textAlign = 'left';
-          ctx.textBaseline = 'middle';
-          ctx.globalAlpha = Math.max(0, Math.min(1, (progress - 0.2) / 0.8));
-          ctx.fillText(text, expandedLogoX + logoSize + 8, badgeY + badgeH / 2);
-          ctx.restore();
+        } else {
+          // Fallback crisp vector chart bars icon
+          ctx.save();
+          ctx.fillStyle = '#089981';
+          ctx.fillRect(logoX + 2, logoY + 9, 3, 7);
+          ctx.fillStyle = '#2962ff';
+          ctx.fillRect(logoX + 7, logoY + 4, 3, 12);
+          ctx.fillStyle = '#00bcd4';
+          ctx.fillRect(logoX + 12, logoY + 6, 3, 10);
           ctx.restore();
         }
+
+        ctx.fillStyle = isDarkTheme ? '#ffffff' : '#131722';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.globalAlpha = Math.max(0, Math.min(1, (progress - 0.2) / 0.8));
+        ctx.fillText(text, expandedLogoX + logoSize + 8, badgeY + badgeH / 2);
+        ctx.restore();
+        ctx.restore();
       }
 
       // 8. Status Line (OHLC)
@@ -742,8 +767,8 @@
         const isUp = activeBar.close >= activeBar.open;
         const textColor = isLight ? '#131722' : '#d1d4dc';
         const labelColor = isLight ? '#707584' : '#9b9ba3';
-        const bullColor = '#26a69a';
-        const bearColor = '#ef5350';
+        const bullColor = '#089981';
+        const bearColor = '#f23645';
         const ohlcColor = isUp ? bullColor : bearColor;
         const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (chartW < 500);
         let curX = 10;
@@ -940,8 +965,19 @@
         }
       });
 
-      // 11. Crosshairs & Cursor Badges
-      if (this.crosshairMode !== 'hidden' && this.isMouseOver && this.mousePos.x <= chartW && this.mousePos.y <= chartH + totalPanelsH) {
+      // 11. Crosshairs & Cursor Badges (Hide while any drawing tool is active or being drawn)
+      const isDrawingActive = !!(
+        this.activeTool ||
+        (this.drawingPoints && this.drawingPoints.length > 0) ||
+        this.dragMode === 'dragDrawing' ||
+        this.dragMode === 'drawingPreview'
+      );
+      const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+      const showCrosshair = !isDrawingActive && this.crosshairMode !== 'hidden' &&
+        (isMobile ? !!this._isCrosshairActiveMobile : this.isMouseOver) &&
+        this.mousePos.x <= chartW && this.mousePos.y <= chartH + totalPanelsH;
+
+      if (showCrosshair) {
         ctx.save();
         const crosshairSettings = window.ChartingAPI && typeof window.ChartingAPI.getCrosshairSettings === 'function' ? window.ChartingAPI.getCrosshairSettings() : null;
         const cColor = crosshairSettings && crosshairSettings.color ? crosshairSettings.color : (isLight ? '#000000' : '#ffffff');
